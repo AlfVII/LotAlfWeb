@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+{% import 'wtf.html' as wtf %}
+{% block app_content %}
+    <style type="text/css" media="screen">
+    .btn-group-vertical > button{
+        margin-bottom:5px;
+    }
+    .btn-group > button{
+        margin-bottom:4px;
+    }
+
+    .loading {
+        position:absolute;
+        left: 50%; 
+        top: 50%;
+        width: 30px;
+        height: 30px;
+    }
+    </style>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="btn btn-outline-secondary mx-2" href="{{ url_for('numbers_collection') }}">Colección de números</a>
+                </li>
+                <li class="nav-item">
+                    <a class="btn btn-outline-secondary mx-2" href="{{ url_for('numbers_statistics') }}">Estadísticas</a>
+                </li>
+            </ul>
+        </div>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <label class="navbar-brand justify-content-center" id="current_number">{{ '{num:05d}'.format(num=current_number) }}</label>
+                </li>
+            </ul>
+        </div>
+        <form class="form-inline">
+          <input class="form-control mr-sm-2" type="search" placeholder="Buscar número" aria-label="Buscar" id="search_number">
+          <button class="btn btn-outline-dark my-2 my-sm-0" type="button" onclick="update_number(null, null)">Buscar</button>
+        </form>
+    </nav>
+    <div class="container-fluid my-3 ">
+        <div class="row">
+            <div class="col-sm-1">
+                <div class="btn-group-vertical" role="group" aria-label="Basic example">
+                    <label>Dec. millar</label>
+                    {% for i in range(10) %}
+                        <button type="button" onclick="update_number(5, {{ i * 10000 }})"  class="btn btn-lg btn-secondary" name="button_number_{{ '{num:05d}'.format(num=i * 10000) }}">{{ '{num:05d}'.format(num=i * 10000) }}</button>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="col-sm-1">
+                <div class="btn-group-vertical" role="group" aria-label="Basic example">
+                    <label>Millares</label>
+                    {% for i in range(10) %}
+                        <button type="button" onclick="update_number(4, {{i * 1000}})"  class="btn btn-lg btn-secondary" name="button_number_{{ '{num:04d}'.format(num=i * 1000) }}">{{ '{num:04d}'.format(num=i * 1000) }}</button>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="col-sm-1">
+                <div class="btn-group-vertical" role="group" aria-label="Basic example">
+                    <label>Centenas</label>
+                    {% for i in range(10) %}
+                        <button type="button" onclick="update_number(3, {{i * 100}})"  class="btn btn-lg btn-secondary" name="button_number_{{ '{num:03d}'.format(num=i * 100) }}">{{ '{num:03d}'.format(num=i * 100) }}</button>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <label>Decenas y unidades</label>
+                <div class="container-fluid" id="hundred_container">            
+                    {% for j in range(10) %}
+                        <div class="row">          
+                            <div class="btn-group ">
+                                {% for i in range(10) %}
+                                    <button type="button" onclick="update_number(2, {{i + j * 10}})"  class="btn btn-lg btn-secondary mr-1" name="button_number_{{ '{num:02d}'.format(num=i + j * 10) }}" id="button_number_{{ '{num:02d}'.format(num=i + j * 10) }}">{{ '{num:02d}'.format(num=i + j * 10) }}</button>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <div id="number_info" class="col-sm-5 px-5 border-left border-secondary">
+                {{ wtf.quick_form(form, horizontal_columns=('sm', 3, 6), form_type='horizontal') }}
+            </div>
+        </div>
+    </div>
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script type="text/javascript" src='./static/retailers_utils.js'></script>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            update_colors($("#current_number").text());
+            $.post('/check_login', {
+            }).done(function(response) {
+                console.log(response)
+                if (response != 'logged in') {
+                    $('#submit').hide()
+                }
+            }).fail(function() {
+                console.log("Error in backend")
+            });
+        });
+
+        $(document).on('change','#origin',function(){
+            $('select[name="origin"] option[value="Default"]').prop('disabled', true);
+        });
+        $(document).on('change','#lot',function(){
+            $('select[name="lot"] option[value="Default"]').prop('disabled', true);
+        });
+        $(document).on('change','#year',function(){
+            $('select[name="year"] option[value="Default"]').prop('disabled', true);
+        });
+        $(document).on('change','#coin',function(){
+            $('select[name="coin"] option[value="Default"]').prop('disabled', true);
+        });
+        $(document).on('change','#retailer_region',function(){
+            update_session('retailer_region', $(this).find("option:selected").attr('value'));
+            load_provinces($(this).find("option:selected").attr('value'))
+        });
+        $(document).on('change','#retailer_province',function(){
+            update_session('retailer_province', $(this).find("option:selected").attr('value'));
+            load_towns($(this).find("option:selected").attr('value'))
+        });
+        $(document).on('change','#retailer_town',function(){
+            update_session('retailer_town', $(this).find("option:selected").attr('value'));
+        });
+    </script>
+{% endblock %}

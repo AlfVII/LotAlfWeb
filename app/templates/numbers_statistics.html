@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+{% import 'wtf.html' as wtf %}
+{% import 'map.html' as map %}
+{% block app_content %}
+    <style type="text/css" media="screen">
+    .btn-group-vertical > button{
+        margin-bottom:5px;
+    }
+    .btn-group > button{
+        margin-bottom:4px;
+    }
+    .radio{
+        margin-top:10px;
+    }
+
+    .loading {
+        position:absolute;
+        left: 50%; 
+        top: 50%;
+        width: 30px;
+        height: 30px;
+    }
+
+    </style>
+
+
+    <div class="container-fluid my-3 ">
+        <div class="row">
+            <div class="col-sm-12">
+                <h5 style="text-align: center;">Colección de números</h5>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-3">
+                <div class="col-md-14 py-1">
+                    <div class="card">
+                        <div class="card-body" >
+                            <canvas id="graph_numbers_filled"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-3">
+                <div class="col-md-14 py-1">
+                    <div class="card">
+                        <div class="card-body">
+                            <canvas id="graph_numbers_statuses"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-3">
+                <div class="col-md-14 py-1">
+                    <div class="card">
+                        <div class="card-body">
+                            <canvas id="graph_numbers_origins"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-3">
+                <div class="col-md-14 py-1">
+                    <div class="card">
+                        <div class="card-body">
+                            <canvas id="graph_numbers_coins"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-6">
+                <div class="col-md-12 py-1">
+                    <div class="card">
+                        <div class="card-body" style="height: 450px">
+                            <canvas id="graph_numbers_years"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="col-md-12 py-1">
+                    <div class="card">
+                        <div class="card-body" style="height: 450px">
+                            <canvas id="graph_numbers_regions"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="col-md-12 py-1">
+                    <div class="card">
+                        <div class="card-body" style="height: 450px">
+                            <canvas id="graph_numbers_provinces"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.6.2/dist/chart.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+    <script type="text/javascript" src='./static/statistics_utils.js'></script>
+    <script type="text/javascript">
+        // chart colors
+        var default_colors = ['#007bff','#28a745','#333333','#c3e6cb','#dc3545','#6c757d'];
+        var numbers_collection_colors = ['#00C851', '#ffbb33', '#6c757d', '#007bff', '#dc3545', '#ff8800', '#17a2b8', '#9933cc', '#343a40'];
+        Chart.register(ChartDataLabels);
+
+
+        $( window ).resize(function() {
+            console.log($(window).width())
+        });
+        $(document).ready(function() {
+            $.post('/get_numbers_statistics', {
+            }).done(function(response) {
+                response = JSON.parse(response);
+                console.log(response);
+                console.log(Object.keys(response['numbers_statuses']));
+
+                create_pie_chart(response['numbers_filled'], "graph_numbers_filled", numbers_collection_colors, "Cantidad de décimos rellenados")
+                create_pie_chart(response['numbers_statuses'], "graph_numbers_statuses", numbers_collection_colors, "Cantidad de décimos según su estado")
+                create_pie_chart(response['numbers_origins'], "graph_numbers_origins", numbers_collection_colors, "Cantidad de décimos según su origen")
+                create_pie_chart(response['numbers_coins'], "graph_numbers_coins", numbers_collection_colors, "Cantidad de décimos según su moneda")
+                create_bar_chart(response['numbers_regions'], "graph_numbers_regions", numbers_collection_colors, "Décimos en la colección por comunidad autónoma", vertical=false)
+                create_bar_chart(response['numbers_years'], "graph_numbers_years", numbers_collection_colors, "Décimos en la colección por año")
+                create_bar_chart(response['numbers_provinces'], "graph_numbers_provinces", numbers_collection_colors, "Décimos en la colección por provincia")
+
+            }).fail(function() {
+                console.log("Error in backend")
+            });
+        });
+        
+    </script>
+
+{% endblock %}

@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% import 'wtf.html' as wtf %}
+
+{% block app_content %}
+    <style type="text/css" media="screen">
+        #login-password{
+            width: 250px !important;
+        }
+    </style>
+    <div class="p-5 text-center bg-light" style="margin-top: 58px;">
+        <h1>Bienvenidos a los décimos de Ildefonso</h1>
+        <h3>Colecciono décimos de loteria y en los botones de arriba podeis ver dos mi colecciones</h3>
+        <h3>Y si quieres dejarme un comentario, aquí abajo puedes hacerlo</h3>
+    </div>
+
+    {% if form %}
+    <div class="container-fluid my-3 ">
+        <div class="row">
+            <div id="number_info" class="col-sm-8 px-5">
+                {{ wtf.quick_form(form, horizontal_columns=('sm', 3, 6), form_type='horizontal') }}
+            </div>
+        </div>
+    </div>
+    <br>
+    {% endif %}
+    <div class="p-2 text-center bg-light" style="margin-top: 20px; margin-bottom: 20px;">
+        <h3>Últimos comentarios</h3>
+    </div>
+    {% for post in posts %}
+        <div class="media my-2">
+            <img class="d-flex rounded-circle avatar z-depth-1-half mr-3" src={{ post.identicon }}
+                alt="Avatar">
+            <div class="media-body">
+                <h5 class="mt-0 font-weight-bold blue-text">{{ post.name }}</h5> {{ post.comment }} </div>
+        </div>
+
+    {% endfor %}
+{% endblock %}

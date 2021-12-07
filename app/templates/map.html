@@ -1,0 +1,29 @@
+{% macro insert_map(latitude,
+                    longitude,
+                    markers='') %}
+
+    <div id="map"></div>
+
+    <style type="text/css">
+        #map{
+            display:block;
+            height:600px;
+        }
+    </style>
+
+    <script>
+        my_marker_own = L.icon({
+           iconUrl: 'static/my_marker_own.png',
+           iconSize: [40, 40]
+        });
+        my_marker_not = L.icon({
+           iconUrl: 'static/my_marker_not.png',
+           iconSize: [40, 40]
+        });
+        var map = L.map('map').setView([{{latitude}}, {{longitude}}], 6);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {attribution: '&copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors'}).addTo(map);
+
+        {{markers|safe}}
+        map.whenReady(on_map_ready)
+    </script>
+{%- endmacro %}

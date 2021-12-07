@@ -1,0 +1,4 @@
+{% import 'wtf.html' as wtf %}
+{% block app_content %}
+    {{ wtf.quick_form(form, horizontal_columns=('sm', 3, 6), form_type='horizontal') }}
+{% endblock %}

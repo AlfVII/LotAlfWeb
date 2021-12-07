@@ -1,0 +1,411 @@
+{% extends "base.html" %}
+{% import 'wtf.html' as wtf %}
+{% import 'map.html' as map %}
+{% block app_content %}
+    <style type="text/css" media="screen">
+    .btn-group-vertical > button{
+        margin-bottom:5px;
+    }
+    .btn-group > button{
+        margin-bottom:4px;
+    }
+    .radio{
+        margin-top:10px;
+    }
+
+    .loading {
+        position:absolute;
+        left: 50%; 
+        top: 50%;
+        width: 30px;
+        height: 30px;
+    }
+    .marker-cluster-owned-small {
+    background-color: rgba(173, 235, 173, 0.6) !important;
+    }
+    .marker-cluster-owned-small div {
+    background-color: rgba(133, 224, 133, 0.6) !important;
+    }
+    .marker-cluster-owned-medium {
+    background-color: rgba(71, 209, 71, 0.6) !important;
+    }
+    .marker-cluster-owned-medium div {
+    background-color: rgba(46, 184, 46, 0.6) !important;
+    }
+    .marker-cluster-owned-large {
+    background-color: rgba(36, 143, 36, 0.6) !important;
+    }
+    .marker-cluster-owned-large div {
+    background-color: rgba(31, 122, 31, 0.6) !important;
+    }
+
+    .marker-cluster-small {
+    background-color: rgba(179, 209, 255, 0.6) !important;
+    }
+    .marker-cluster-small div {
+    background-color: rgba(128, 179, 255, 0.6) !important;
+    }
+    .marker-cluster-medium {
+    background-color: rgba(77, 148, 255, 0.6) !important;
+    }
+    .marker-cluster-medium div {
+    background-color: rgba(26, 117, 255, 0.6) !important;
+    }
+    .marker-cluster-large {
+    background-color: rgba(0, 82, 204, 0.6) !important;
+    }
+    .marker-cluster-large div {
+    background-color: rgba(0, 61, 153, 0.6) !important;
+    }
+    video, .screenshot {
+      /* override other styles to make responsive */
+      width: 100%    !important;
+      height: auto   !important;
+    }
+
+
+    </style>
+
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="btn btn-outline-secondary mr-2" href="{{ url_for('retailers_collection') }}">Colección de administraciones</a>
+                </li>
+                <li class="nav-item">
+                    <a class="btn btn-outline-secondary mr-2" href="{{ url_for('retailers_statistics') }}">Estadísticas</a>
+                </li>
+            </ul>
+        </div>
+        <div class="navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <button class="btn btn-outline-info mr-5 my-sm-0" type="button" onclick="load_all_retailers()">Mostrar todas</button>
+                </li>
+                <li class="nav-item">
+                    <button class="btn btn-outline-info mr-5 my-sm-0" type="button" onclick="load_all_retailers(true)">Mostrar todas en la colección</button>
+                </li>
+            </ul>
+        </div>
+        <form class="form-inline">
+            <input class="form-control mr-sm-2" type="search" placeholder="Buscar localidad" aria-label="Buscar" id="search_town">
+            <button class="btn btn-outline-primary my-2 my-sm-0" type="button" onclick="find_town()">Buscar</button>
+        </form>
+    </nav>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="crossorigin=""/>
+    <link rel="stylesheet" type="text/css" href="http://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.4.1/MarkerCluster.css" />
+    <link rel="stylesheet" type="text/css" href="http://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.4.1/MarkerCluster.Default.css" />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==" crossorigin=""></script>
+    <script type='text/javascript' src='http://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.4.1/leaflet.markercluster.js'></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script type="text/javascript" src='./static/retailers_utils.js'></script>
+    <script type="text/javascript">
+        var map_lock = true;
+        $(document).ready(function() {
+            $.post('/check_login', {
+            }).done(function(response) {
+                console.log(response)
+                if (response != 'logged in') {
+                    $('#submit_save').hide()
+                    $('#start_video_button').hide()
+                }
+            }).fail(function() {
+                console.log("Error in backend")
+            });
+
+        });
+        function load_all_retailers(owned=false) {
+            $("#map_container").html('<img class="loading" src="./static/loading.gif">');
+            $.post('/update_map', {
+                all_retailers: !owned,
+                all_owned_retailers: owned
+            }).done(function(response) {
+                $("#map_container").html(response);
+            }).fail(function() {
+                console.log("Error in backend")
+            });
+        }
+        function find_town(owned=false) {
+            $("#map_container").html('<img class="loading" src="./static/loading.gif">');
+            $.post('/update_map', {
+                all_retailers: false,
+                all_owned_retailers: false,
+                retailer_town: $("#search_town").val()
+            }).done(function(response) {
+                $("#map_container").html(response);
+            }).fail(function() {
+                console.log("Error in backend")
+            });
+        }
+        function on_map_ready(e) {
+            map_lock = true;
+        }
+        function load_data(datum) {
+            set_value_or_default('retailer_street', datum['retailer_street'])
+            set_value_or_default('retailer_street_number', datum['retailer_street_number'])
+            set_value_or_default('retailer_postal_code', datum['retailer_postal_code'], title=false)
+            set_value_or_default('retailer_telephone', datum['retailer_telephone'], title=false)
+            if ('number' in datum){
+                if (datum['number'] != "<NA>") {
+                    set_value_or_default('number', datum['number'])
+                    $('input:radio[name=owned]').filter('[value=Owned]').prop('checked', true);
+                }
+                else {
+                    $('#number').val('');
+                    $('input:radio[name=owned]').filter('[value="Not owned"]').prop('checked', true);
+                }
+            }
+            else{
+                $('input:radio[name=owned]').filter('[value="Not owned"]').prop('checked', true);
+                $('#number').val('');
+            }
+
+            set_value_or_default('retailer_latitude', datum['retailer_latitude'], title=false);
+            set_value_or_default('retailer_longitude', datum['retailer_longitude'], title=false);
+            $.post('/load_image', {
+                retailer_region: datum['retailer_region'],
+                retailer_province: datum['retailer_province'],
+                retailer_town: datum['retailer_town'],
+                retailer_number: datum['retailer_number']
+            }).done(function(response) {
+                if (response == '') {
+                    $("#image").attr("src", "./static/alt_image.png");
+                }
+                else {
+                    image = "data:image/webp;base64," + response
+                    $("#image").attr("src", image);
+                }
+            }).fail(function() {
+                console.log("Error in backend")
+            });
+        }
+        function clear_data() {
+            $('#retailer_street').val('');
+            $('#retailer_street_number').val('');
+            $('#retailer_postal_code').val('');
+            $('#retailer_telephone').val('');
+            $('#number').val('');
+            $('input:radio[name=owned]').filter('[value="Not owned"]').prop('checked', true);
+            $('#retailer_latitude').val('');
+            $('#retailer_longitude').val('');
+        }
+        function click_on_marker(e) {
+            // console.log(this.getContent())
+            raw_content = this.getPopup().getContent();
+            content = raw_content.split('<br>');
+            var datum = []
+            datum['retailer_region'] = content[0]
+            datum['retailer_province'] = content[1]
+            datum['retailer_town'] = content[2]
+            datum['retailer_number'] = content[3]
+            datum['retailer_street'] = content[4]
+            datum['retailer_street_number'] = content[5]
+            datum['retailer_postal_code'] = content[6]
+            datum['retailer_telephone'] = content[7]
+            datum['number'] = content[8]
+            datum['retailer_latitude'] = this.getLatLng().lat;
+            datum['retailer_longitude'] = this.getLatLng().lng;
+            update_session_multi(['retailer_region', 'retailer_province', 'retailer_town'], [datum['retailer_region'], datum['retailer_province'], datum['retailer_town']]);
+
+            set_value_or_default('retailer_region', datum['retailer_region'])
+            var selection = []
+            selection['province'] = toTitleCase(datum['retailer_province']);
+            selection['town'] = toTitleCase(datum['retailer_town']);
+            selection['number'] = datum['retailer_number'];
+            load_provinces(toTitleCase(datum['retailer_region']), selection);
+            load_data(datum);
+        }
+        $(document).on('change','#retailer_region',function(){
+            new_region = $(this).find("option:selected").attr('value');
+            update_session('retailer_region', new_region);
+            load_provinces($(this).find("option:selected").attr('value'))
+            $("#map_container").html('<img class="loading" src="./static/loading.gif">');
+            $.post('/update_map', {
+                all_retailers: false,
+                retailer_region: new_region,
+                retailer_province: null,
+                retailer_town: null,
+                retailer_number: null
+            }).done(function(response) {
+                $("#map_container").html(response);
+            }).fail(function() {
+                console.log("Error in backend")
+            });
+        });
+        $(document).on('change','#retailer_province',function(){
+            new_province = $(this).find("option:selected").attr('value');
+            update_session('retailer_province', new_province);
+            load_towns($(this).find("option:selected").attr('value'))
+            $("#map_container").html('<img class="loading" src="./static/loading.gif">');
+            $.post('/update_map', {
+                all_retailers: false,
+                retailer_region: null,
+                retailer_province: new_province,
+                retailer_town: null,
+                retailer_number: null
+            }).done(function(response) {
+                $("#map_container").html(response);
+            }).fail(function() {
+                console.log("Error in backend")
+            });
+        });
+        $(document).on('change','#retailer_town',function(){
+            new_town = $(this).find("option:selected").attr('value');
+            update_session('retailer_town', new_town);
+            $("#map_container").html('<img class="loading" src="./static/loading.gif">');
+            $.post('/update_map', {
+                all_retailers: false,
+                retailer_region: null,
+                retailer_province: $('#retailer_province').find("option:selected").attr('value'),
+                retailer_town: new_town,
+                retailer_number: null
+            }).done(function(response) {
+                $("#map_container").html(response);
+            }).fail(function() {
+                console.log("Error in backend")
+            });
+        });
+        $(document).on('change','#retailer_number',function(){
+            new_number = $(this).val();
+            console.log(map_lock);
+            if (map_lock) {
+                map_lock = false;
+                $("#map_container").html('<img class="loading" src="./static/loading.gif">');
+                retailer_town = $('#retailer_town').find("option:selected").attr('value');
+                if (retailer_town === undefined){
+                    retailer_town = ''
+                }
+                $.post('/update_map', {
+                    all_retailers: false,
+                    retailer_region: null,
+                    retailer_number: new_number,
+                    retailer_province: $('#retailer_province').find("option:selected").attr('value'),
+                    retailer_town: retailer_town
+                }).done(function(response) {
+                    $("#map_container").html(response);
+                    retailer_region = $('#retailer_region').find("option:selected").attr('value');
+                    retailer_province = $('#retailer_province').find("option:selected").attr('value');
+                    retailer_town = $('#retailer_town').find("option:selected").attr('value');
+                    retailer_number = $('#retailer_number').val();
+                    console.log(retailer_region);
+                    console.log(retailer_province);
+                    console.log(retailer_town);
+                    console.log(retailer_number);
+                    if((retailer_region !== undefined) & (retailer_province !== undefined) & (retailer_town !== undefined)){
+                        $.post('/get_retailer_data', {
+                            retailer_region: retailer_region,
+                            retailer_province: retailer_province,
+                            retailer_town: retailer_town,
+                            retailer_number: retailer_number
+                        }).done(function(response) {
+                            response = JSON.parse(response);
+                            console.log(response);
+                            if (response != null) {
+                                load_data(response);
+                            }
+                            else{
+                                clear_data();
+                            }
+                        })
+                    }
+                }).fail(function() {
+                    console.log("Error in backend")
+                });
+            }
+        });
+
+    </script>
+    <div class="container-fluid my-3 ">
+        <div class="row">
+            <div class="col-sm-3">
+                {{ wtf.quick_form(form, horizontal_columns=('sm', 4, 8), form_type='horizontal') }}
+            </div>
+            <div class="col-sm-5">
+                <div id="map_container">
+                    {{ map.insert_map(latitude, longitude, markers) }}
+                </div>
+
+            </div>
+            <div class="col-sm-4">
+                <div class="container-fluid">
+                    <div id="screenshot" style="text-align:center;">
+                        <div id="visualization">
+                            <img src="./static/alt_image.png" class="screenshot my-2" id="image" alt="">
+                        </div>
+
+                        <div id="screen_button">
+                            <button class="enable_video_button btn btn-outline-success my-2 my-sm-0" onclick="enable_video()" id="start_video_button">Iniciar captura</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const constraints = {
+            video: { width: { exact: 640 }, height: { exact: 450 } },
+        };
+        // const screenshotButton = document.querySelector("#screenshot-button");
+        // const img = document.querySelector("#screenshot img");
+        const canvas = document.createElement("canvas");
+
+        function enable_video() {
+            change_mode("video");
+            navigator.mediaDevices
+                .getUserMedia(constraints)
+                .then(handleSuccess)
+                .catch(handleError);
+        };
+
+        // document.querySelector("#screen_button .take_screenshot_button").onclick = document.querySelector("#screenshot video").onclick = function () {
+        function take_screenshot() {
+            video = document.querySelector("#visualization video")
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext("2d").drawImage(video, 0, 0);
+            // Other browsers will fall back to image/png
+
+            change_mode("screenshot");
+            document.querySelector("#visualization img").src = canvas.toDataURL("image/webp");
+            change_button_mode("video");
+
+            $.post('/store_image', {
+                image: canvas.toDataURL("image/webp")
+            }).done(function(response) {
+            }).fail(function() {
+                console.log("Error in backend")
+            });
+
+        };
+
+        function change_mode(mode) {
+            if (mode == 'video') {
+                $("#visualization").html('<video autoplay class="my-2"></video>\n<canvas style="display:none;" class="my-2"></canvas>');
+            }
+            else{
+                $("#visualization").html('<img src="./static/alt_image.png" class="screenshot my-2" id="image" alt="">');
+            }
+        };
+
+        function change_button_mode(mode) {
+            if (mode == 'video') {
+                $("#screen_button").html('<button class="enable_video_button btn btn-outline-success my-2 my-sm-0" onclick="enable_video()">Iniciar captura</button>')
+            }
+            else{
+                $("#screen_button").html('<button class="take_screenshot_button btn btn-outline-success my-2 my-sm-0" onclick="take_screenshot()">Echar foto</button>')
+            }
+        };
+
+        function handleSuccess(stream) {
+            change_button_mode("screenshot");
+            // screenshotButton.disabled = false;
+            document.querySelector("#visualization video").srcObject = stream;
+        }
+
+        function handleError(error) {
+            console.error("Error: ", error);
+        }
+    </script>
+{% endblock %}

@@ -1,0 +1,8 @@
+flask
+flask_wtf
+python-dotenv
+psycopg2-binary
+sqlalchmey
+pandas
+numpy
+overpy

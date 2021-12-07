@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% import 'wtf.html' as wtf %}
+{% import 'map.html' as map %}
+{% block app_content %}
+    <style type="text/css" media="screen">
+    .btn-group-vertical > button{
+        margin-bottom:5px;
+    }
+    .btn-group > button{
+        margin-bottom:4px;
+    }
+    .radio{
+        margin-top:10px;
+    }
+
+    .loading {
+        position:absolute;
+        left: 50%; 
+        top: 50%;
+        width: 30px;
+        height: 30px;
+    }
+
+    </style>
+
+
+    <div class="container-fluid my-3 ">
+        <div class="row">
+            <div class="col-sm-12">
+                <h5 style="text-align: center;">Colección de números</h5>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-3">
+                <div class="col-md-14 py-1">
+                    <div class="card">
+                        <div class="card-body" >
+                            <canvas id="graph_retailers_filled"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-3">
+                <div class="col-md-14 py-1">
+                    <div class="card">
+                        <div class="card-body">
+                            <canvas id="graph_retailers_with_image"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="col-md-12 py-1">
+                    <div class="card">
+                        <div class="card-body" style="height: 450px">
+                            <canvas id="graph_retailers_regions"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="col-md-12 py-1">
+                    <div class="card">
+                        <div class="card-body" style="height: 450px">
+                            <canvas id="graph_retailers_provinces"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.6.2/dist/chart.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+    <script type="text/javascript" src='./static/statistics_utils.js'></script>
+    <script type="text/javascript">
+        // chart colors
+        var default_colors = ['#007bff','#28a745','#333333','#c3e6cb','#dc3545','#6c757d'];
+        var retailers_collection_colors = ['#00C851', '#ffbb33', '#6c757d', '#007bff', '#dc3545', '#ff8800', '#17a2b8', '#9933cc', '#343a40'];
+        Chart.register(ChartDataLabels);
+
+        $( window ).resize(function() {
+            console.log($(window).width())
+        });
+        $(document).ready(function() {
+            $.post('/get_retailers_statistics', {
+            }).done(function(response) {
+                response = JSON.parse(response);
+                console.log(response);
+
+                create_pie_chart(response['retailers_filled'], "graph_retailers_filled", retailers_collection_colors, "Cantidad de décimos rellenados")
+                create_pie_chart(response['retailers_with_image'], "graph_retailers_with_image", retailers_collection_colors, "Cantidad de décimos según su estado")
+                create_bar_chart(response['retailers_regions'], "graph_retailers_regions", retailers_collection_colors, "Décimos en la colección por comunidad autónoma", vertical=false)
+                create_bar_chart(response['retailers_provinces'], "graph_retailers_provinces", retailers_collection_colors, "Décimos en la colección por provincia")
+
+            }).fail(function() {
+                console.log("Error in backend")
+            });
+        });
+        
+    </script>
+
+{% endblock %}
