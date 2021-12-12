@@ -2,7 +2,8 @@ flask
 flask_wtf
 python-dotenv
 psycopg2-binary
-sqlalchmey
+sqlalchemy
 pandas
 numpy
 overpy
+gunicorn
