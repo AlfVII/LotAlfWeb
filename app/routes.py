@@ -55,8 +55,8 @@ def retailers_collection():
 
     if form.validate_on_submit():
         data = form.data
-        if os.path.isfile("app/tmp/image.jpg"):
-            with open("app/tmp/image.jpg", "rb") as image_file:
+        if os.path.isfile("/tmp/image.jpg"):
+            with open("/tmp/image.jpg", "rb") as image_file:
                 data['image'] = base64.b64encode(image_file.read())
         else:
             data['image'] = None
@@ -274,10 +274,10 @@ def store_image():
     prefix = 'data:image/webp;base64,'
     cut_image = image[len(prefix):]
     imgdata = base64.b64decode(cut_image)
-    filename = os.path.abspath(os.path.join(os.path.dirname(__file__), '/tmp/image.jpg'))
+    filename = '/tmp/image.jpg'
     with open(filename, 'wb') as f:
         f.write(imgdata)
-    response = make_response(json.dumps(True))
+    response = make_response(json.dumps(filename))
     response.content_type = 'application/jsons'
     return response
 

@@ -4,6 +4,19 @@ function pad(num, size) {
     return num;
 }
 
+function resize_buttons() {
+    if ($(window).width() < 1000) {
+        $(".btn").removeClass('btn-lg').removeClass('btn-md').removeClass('btn-sm').addClass('btn-sm');
+    }
+    else if ($(window).width() < 1250) {
+        $(".btn").removeClass('btn-lg').removeClass('btn-md').removeClass('btn-sm').addClass('btn-md');
+    }
+    else {
+        $(".btn").removeClass('btn-lg').removeClass('btn-md').removeClass('btn-sm').addClass('btn-lg');
+    }
+}
+
+
 function update_colors(number) {
     var button_html = $("#hundred_container").html();
     $("#hundred_container").html('<img class="loading" src="./static/loading.gif">');
@@ -28,7 +41,7 @@ function update_colors(number) {
 
         }
         // $("#number_info").html(form_html)
-
+        resize_buttons()
 
     }).fail(function() {
         $("#hundred_container").html("Error getting existing for " + number);

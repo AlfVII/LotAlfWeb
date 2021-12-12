@@ -374,6 +374,7 @@
             $.post('/store_image', {
                 image: canvas.toDataURL("image/webp")
             }).done(function(response) {
+                console.log(response)
             }).fail(function() {
                 console.log("Error in backend")
             });

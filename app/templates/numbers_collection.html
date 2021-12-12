@@ -16,6 +16,8 @@
         width: 30px;
         height: 30px;
     }
+
+
     </style>
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <div class="collapse navbar-collapse" id="navbarNav">
@@ -66,7 +68,7 @@
                     {% endfor %}
                 </div>
             </div>
-            <div class="col-sm-4">
+            <div class="col-sm-6">
                 <label>Decenas y unidades</label>
                 <div class="container-fluid" id="hundred_container">            
                     {% for j in range(10) %}
@@ -80,8 +82,8 @@
                     {% endfor %}
                 </div>
             </div>
-            <div id="number_info" class="col-sm-5 px-5 border-left border-secondary">
-                {{ wtf.quick_form(form, horizontal_columns=('sm', 3, 6), form_type='horizontal') }}
+            <div id="number_info" class="col-sm-3 px-2 border-left border-secondary">
+                {{ wtf.quick_form(form, horizontal_columns=('sm', 4, 8), form_type='horizontal') }}
             </div>
         </div>
     </div>
@@ -92,6 +94,7 @@
     <script type="text/javascript">
         $(document).ready(function() {
             update_colors($("#current_number").text());
+            resize_buttons();
             $.post('/check_login', {
             }).done(function(response) {
                 console.log(response)
@@ -101,6 +104,9 @@
             }).fail(function() {
                 console.log("Error in backend")
             });
+        });
+        $(window).resize(function() {
+            resize_buttons();
         });
 
         $(document).on('change','#origin',function(){
