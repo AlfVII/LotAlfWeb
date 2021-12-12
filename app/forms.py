@@ -68,8 +68,8 @@ class NumberForm(FlaskForm):
 
 
 class PostForm(FlaskForm):
-    name = StringField('Dime quien eres', validators=[DataRequired()])
-    email = EmailField('Dime cómo contactarte', validators=[DataRequired()])
+    name = StringField('Nombre', validators=[DataRequired()])
+    email = EmailField('E-mail', validators=[DataRequired()])
     post = TextAreaField('Mensaje', validators=[DataRequired()])
     submit = SubmitField('Añadir comentario')
 
