@@ -1,5 +1,6 @@
 import pandas
 import sqlalchemy
+import os
 from sqlalchemy.ext.automap import automap_base
 
 
@@ -8,7 +9,7 @@ class RetailersCollectionDB():
         self.connection = self.create_connection()
 
     def create_connection(self):
-        engine = sqlalchemy.create_engine("postgresql://alfvii:2Galletas!@localhost:5432/autop", connect_args={'connect_timeout': 10})
+        engine = sqlalchemy.create_engine(f"postgresql://{os.environ['DB_USER']}:{os.environ['DB_PASSWORD']}@{os.environ['DB_ADDRESS']}:{os.environ['DB_PORT']}/{os.environ['DB_NAME']}", connect_args={'connect_timeout': 10})
         schema = "public"
 
         metadata = sqlalchemy.MetaData()

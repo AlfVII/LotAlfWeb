@@ -1,6 +1,7 @@
 import pandas
 import sqlalchemy
 from sqlalchemy.ext.automap import automap_base
+import os
 
 
 class CommentsDB():
@@ -8,13 +9,16 @@ class CommentsDB():
         self.connection = self.create_connection()
 
     def create_connection(self):
-        engine = sqlalchemy.create_engine("postgresql://alfvii:2Galletas!@localhost:5432/autop", connect_args={'connect_timeout': 10})
+        engine = sqlalchemy.create_engine(f"postgresql://{os.environ['DB_USER']}:{os.environ['DB_PASSWORD']}@{os.environ['DB_ADDRESS']}:{os.environ['DB_PORT']}/{os.environ['DB_NAME']}", connect_args={'connect_timeout': 10})
         schema = "public"
 
         metadata = sqlalchemy.MetaData()
-        metadata.reflect(engine, schema=schema, only=['comments'])
+        metadata.reflect(engine, schema=schema)
+        # metadata.reflect(engine, schema=schema, only=['comments'])
+        print(metadata.tables.keys())
         Base = automap_base(metadata=metadata)
         Base.prepare()
+        print(dir(Base.classes))
         self.CommentsTable = Base.classes.comments
 
         Session = sqlalchemy.orm.sessionmaker(bind=engine)
