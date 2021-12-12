@@ -13,26 +13,28 @@
         <h3>Y si quieres dejarme un comentario, aquí abajo puedes hacerlo</h3>
     </div>
 
-    {% if form %}
     <div class="container-fluid my-3 ">
         <div class="row">
-            <div id="number_info" class="col-sm-8 px-5">
-                {{ wtf.quick_form(form, horizontal_columns=('sm', 3, 6), form_type='horizontal') }}
+            <div id="number_info" class="col-sm-4 px-2">
+                {{ wtf.quick_form(form, horizontal_columns=('sm', 4, 8), form_type='horizontal') }}
             </div>
-        </div>
-    </div>
-    <br>
-    {% endif %}
-    <div class="p-2 text-center bg-light" style="margin-top: 20px; margin-bottom: 20px;">
-        <h3>Últimos comentarios</h3>
-    </div>
-    {% for post in posts %}
-        <div class="media my-2">
-            <img class="d-flex rounded-circle avatar z-depth-1-half mr-3" src={{ post.identicon }}
-                alt="Avatar">
-            <div class="media-body">
-                <h5 class="mt-0 font-weight-bold blue-text">{{ post.name }}</h5> {{ post.comment }} </div>
-        </div>
+            <div id="number_info" class="col-sm-8 px-2 border-left border-secondary">
 
-    {% endfor %}
+                <div class="p-2 text-center bg-light" style="margin-top: 20px; margin-bottom: 20px;">
+                    <h3>Últimos comentarios</h3>
+                </div>
+                {% for post in posts %}
+                    <div class="media my-2">
+                        <img class="d-flex rounded-circle avatar z-depth-1-half mr-3" src={{ post.identicon }}
+                            alt="Avatar">
+                        <div class="media-body">
+                            <h5 class="mt-0 font-weight-bold blue-text">{{ post.name }}</h5> {{ post.comment }} </div>
+                    </div>
+
+                    </div>
+                </div>
+                <br>
+                {% endfor %}
+            </div>
+
 {% endblock %}
