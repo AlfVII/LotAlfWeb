@@ -6,12 +6,15 @@ function pad(num, size) {
 
 function resize_buttons() {
     if ($(window).width() < 1000) {
+        $(".group_label").css("font-size", 12);
         $(".btn").removeClass('btn-lg').removeClass('btn-md').removeClass('btn-sm').addClass('btn-sm');
     }
     else if ($(window).width() < 1250) {
+        $(".group_label").css("font-size", 14);
         $(".btn").removeClass('btn-lg').removeClass('btn-md').removeClass('btn-sm').addClass('btn-md');
     }
     else {
+        $(".group_label").css("font-size", 19);
         $(".btn").removeClass('btn-lg').removeClass('btn-md').removeClass('btn-sm').addClass('btn-lg');
     }
 }
