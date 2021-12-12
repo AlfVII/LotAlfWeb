@@ -15,10 +15,8 @@ class CommentsDB():
         metadata = sqlalchemy.MetaData()
         metadata.reflect(engine, schema=schema)
         # metadata.reflect(engine, schema=schema, only=['comments'])
-        print(metadata.tables.keys())
         Base = automap_base(metadata=metadata)
         Base.prepare()
-        print(dir(Base.classes))
         self.CommentsTable = Base.classes.comments
 
         Session = sqlalchemy.orm.sessionmaker(bind=engine)

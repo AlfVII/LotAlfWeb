@@ -7,4 +7,4 @@ pandas
 numpy
 overpy
 gunicorn
-flask_bootstrap
+bootstrap-flask
