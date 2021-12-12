@@ -274,7 +274,7 @@ def store_image():
     prefix = 'data:image/webp;base64,'
     cut_image = image[len(prefix):]
     imgdata = base64.b64decode(cut_image)
-    filename = 'app/tmp/image.jpg'
+    filename = os.path.abspath(os.path.join(os.path.dirname(__file__), '/tmp/image.jpg'))
     with open(filename, 'wb') as f:
         f.write(imgdata)
     response = make_response(json.dumps(True))
