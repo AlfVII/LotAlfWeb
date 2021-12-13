@@ -7,48 +7,54 @@ function pad(num, size) {
 function resize_buttons() {
     if ($(window).width() < 1000) {
         $(".group_label").css("font-size", 12);
-        $(".btn").removeClass('btn-lg').removeClass('btn-md').removeClass('btn-sm').addClass('btn-sm');
+        $(".btn_number").removeClass('btn-lg').removeClass('btn-md').removeClass('btn-sm').addClass('btn-sm');
     }
     else if ($(window).width() < 1250) {
         $(".group_label").css("font-size", 14);
-        $(".btn").removeClass('btn-lg').removeClass('btn-md').removeClass('btn-sm').addClass('btn-md');
+        $(".btn_number").removeClass('btn-lg').removeClass('btn-md').removeClass('btn-sm').addClass('btn-md');
     }
     else {
         $(".group_label").css("font-size", 19);
-        $(".btn").removeClass('btn-lg').removeClass('btn-md').removeClass('btn-sm').addClass('btn-lg');
+        $(".btn_number").removeClass('btn-lg').removeClass('btn-md').removeClass('btn-sm').addClass('btn-lg');
     }
 }
 
+var update_number_enabled = true;
+var update_colors_enabled = true;
 
 function update_colors(number) {
-    var button_html = $("#hundred_container").html();
-    $("#hundred_container").html('<img class="loading" src="./static/loading.gif">');
-    $.post('/get_existing_in_hundred', {
-        number: number - (number % 100)
-    }).done(function(response) {
-        $("#hundred_container").html(button_html);
-        response = JSON.parse(response)
-        console.log(response)
+    if (update_colors_enabled) {
+        update_colors_enabled = false;
+        var button_html = $("#hundred_container").html();
+        $("#hundred_container").html('<img class="loading" src="./static/loading.gif">');
+        $.post('/get_existing_in_hundred', {
+            number: number - (number % 100)
+        }).done(function(response) {
+            $("#hundred_container").html(button_html);
+            response = JSON.parse(response)
 
-        for (var i = 0; i < response.length; i++){
-            $("#button_number_" + pad(i, 2)).removeClass('btn-success ').removeClass('btn-secondary ').removeClass('btn-warning ');
-            if (response[i] == "Perfecto") {
-                $("#button_number_" + pad(i, 2)).addClass('btn-success ');
-            }
-            else if (response[i] == "Defectuoso") {
-                $("#button_number_" + pad(i, 2)).addClass('btn-warning ');
-            }
-            else if (response[i] == "Falta") {
-                $("#button_number_" + pad(i, 2)).addClass('btn-secondary ');
-            }
+            for (var i = 0; i < response.length; i++){
+                $("#button_number_" + pad(i, 2)).removeClass('btn-success ').removeClass('btn-secondary ').removeClass('btn-warning ');
+                if (response[i] == "Perfecto") {
+                    $("#button_number_" + pad(i, 2)).addClass('btn-success ');
+                }
+                else if (response[i] == "Defectuoso") {
+                    $("#button_number_" + pad(i, 2)).addClass('btn-warning ');
+                }
+                else if (response[i] == "Falta") {
+                    $("#button_number_" + pad(i, 2)).addClass('btn-secondary ');
+                }
 
-        }
-        // $("#number_info").html(form_html)
-        resize_buttons()
+            }
+            // $("#number_info").html(form_html)
+            resize_buttons()
+            update_colors_enabled = true;
 
-    }).fail(function() {
-        $("#hundred_container").html("Error getting existing for " + number);
-    });
+        }).fail(function() {
+            $("#hundred_container").html("Error getting existing for " + number);
+            update_colors_enabled = true;
+        });
+    }
 }
 
 function toTitleCase(str) {
@@ -98,67 +104,68 @@ function set_value_or_default(key, value, title=true) {
         $("#" + key).val(aux);
     }
     else{
-        // console.log($('select[name="' + key + '"] option[value="Default"]').prop('disabled'));
-        // $('select[name="' + key + '"] option[value="Default"]').prop('disabled', false);
-        // console.log($('select[name="' + key + '"] option[value="Default"]').prop('disabled'));
         $("#" + key).val("Default");
     }
 }
 
 function update_number(exp, number) {
-    var current_number = $("#current_number").text();
-    if (exp == null){
-        new_number = $('#search_number').val();
-        if (isNaN(new_number) | (new_number == '') | (new_number < 0) | (new_number > 99999)) {
-            $('#search_number').addClass("border-danger");
-            new_number = current_number;
+    if (update_number_enabled & update_colors_enabled) {
+        update_number_enabled = false;
+        var current_number = $("#current_number").text();
+        if (exp == null){
+            new_number = $('#search_number').val();
+            if (isNaN(new_number) | (new_number == '') | (new_number < 0) | (new_number > 99999)) {
+                $('#search_number').addClass("border-danger");
+                new_number = current_number;
+            }
+            else {
+                $('#search_number').removeClass("border-danger");
+            }
+
         }
         else {
-            $('#search_number').removeClass("border-danger");
+            var new_number = Math.floor(current_number / Math.pow(10, exp)) * Math.pow(10, exp);
+            if (exp > 2) {
+                new_number = new_number + current_number % Math.pow(10, exp - 1);
+            }
+            new_number = new_number + number;
         }
+        $("#current_number").text(pad(new_number, 5));
 
-    }
-    else {
-        var new_number = Math.floor(current_number / Math.pow(10, exp)) * Math.pow(10, exp);
-        if (exp > 2) {
-            new_number = new_number + current_number % Math.pow(10, exp - 1);
+        var form_html =  $("#number_info").html()
+
+        $("#number_info").html('<img class="loading" src="./static/loading.gif">');
+        $.post('/get_number', {
+            new_number: new_number
+        }).done(function(response) {
+            response = JSON.parse(response)
+            $("#number_info").html(form_html);
+            $("#status").val(toTitleCase(response['status']));
+            set_value_or_default('origin', response['origin'])
+            response['lot'] = response['lot'].split('/')[0];
+            set_value_or_default('lot', response['lot'])
+            set_value_or_default('year', response['year'], title=false)
+            set_value_or_default('coin', response['coin'])
+            set_value_or_default('retailer_region', response['retailer_region'])
+            var selection = []
+            selection['province'] = toTitleCase(response['retailer_province']);
+            selection['town'] = toTitleCase(response['retailer_town']);
+            selection['number'] = response['retailer_number'];
+            load_provinces(toTitleCase(response['retailer_region']), selection);
+            update_session('retailer_region', response['retailer_region']);
+            $("#retailer_town").val(toTitleCase(response['retailer_town']));
+            $("#retailer_number").val(response['retailer_number']);
+            $("#copies").val(response['copies']);
+            update_number_enabled = true;
+
+        }).fail(function() {
+            $("#number_info").html("Error getting " + new_number);
+            update_number_enabled = true;
+        });
+
+        if ((exp > 2) | (exp == null)){
+            update_colors(new_number);
         }
-        new_number = new_number + number;
-    }
-    $("#current_number").text(pad(new_number, 5));
-
-    var form_html =  $("#number_info").html()
-
-    $("#number_info").html('<img class="loading" src="./static/loading.gif">');
-    $.post('/get_number', {
-        new_number: new_number
-    }).done(function(response) {
-        response = JSON.parse(response)
-        $("#number_info").html(form_html);
-        $("#status").val(toTitleCase(response['status']));
-        set_value_or_default('origin', response['origin'])
-        response['lot'] = response['lot'].split('/')[0];
-        console.log(response)
-        set_value_or_default('lot', response['lot'])
-        set_value_or_default('year', response['year'], title=false)
-        set_value_or_default('coin', response['coin'])
-        set_value_or_default('retailer_region', response['retailer_region'])
-        var selection = []
-        selection['province'] = toTitleCase(response['retailer_province']);
-        selection['town'] = toTitleCase(response['retailer_town']);
-        selection['number'] = response['retailer_number'];
-        load_provinces(toTitleCase(response['retailer_region']), selection);
-        update_session('retailer_region', response['retailer_region']);
-        $("#retailer_town").val(toTitleCase(response['retailer_town']));
-        $("#retailer_number").val(response['retailer_number']);
-        $("#copies").val(response['copies']);
-
-    }).fail(function() {
-        $("#number_info").html("Error getting " + new_number);
-    });
-
-    if ((exp > 2) | (exp == null)){
-        update_colors(new_number);
     }
 }
 

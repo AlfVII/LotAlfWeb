@@ -48,7 +48,7 @@
                 <div class="btn-group-vertical" role="group" aria-label="Basic example">
                     <label class="group_label">Dec. millar</label>
                     {% for i in range(10) %}
-                        <button type="button" onclick="update_number(5, {{ i * 10000 }})"  class="btn btn-lg btn-secondary" name="button_number_{{ '{num:05d}'.format(num=i * 10000) }}">{{ '{num:05d}'.format(num=i * 10000) }}</button>
+                        <button type="button" onclick="update_number(5, {{ i * 10000 }})"  class="btn_number btn btn-lg btn-secondary" name="button_number_{{ '{num:05d}'.format(num=i * 10000) }}">{{ '{num:05d}'.format(num=i * 10000) }}</button>
                     {% endfor %}
                 </div>
             </div>
@@ -56,7 +56,7 @@
                 <div class="btn-group-vertical" role="group" aria-label="Basic example">
                     <label class="group_label">Millares</label>
                     {% for i in range(10) %}
-                        <button type="button" onclick="update_number(4, {{i * 1000}})"  class="btn btn-lg btn-secondary" name="button_number_{{ '{num:04d}'.format(num=i * 1000) }}">{{ '{num:04d}'.format(num=i * 1000) }}</button>
+                        <button type="button" onclick="update_number(4, {{i * 1000}})"  class="btn_number btn btn-lg btn-secondary" name="button_number_{{ '{num:04d}'.format(num=i * 1000) }}">{{ '{num:04d}'.format(num=i * 1000) }}</button>
                     {% endfor %}
                 </div>
             </div>
@@ -64,7 +64,7 @@
                 <div class="btn-group-vertical" role="group" aria-label="Basic example">
                     <label class="group_label">Centenas</label>
                     {% for i in range(10) %}
-                        <button type="button" onclick="update_number(3, {{i * 100}})"  class="btn btn-lg btn-secondary" name="button_number_{{ '{num:03d}'.format(num=i * 100) }}">{{ '{num:03d}'.format(num=i * 100) }}</button>
+                        <button type="button" onclick="update_number(3, {{i * 100}})"  class="btn_number btn btn-lg btn-secondary" name="button_number_{{ '{num:03d}'.format(num=i * 100) }}">{{ '{num:03d}'.format(num=i * 100) }}</button>
                     {% endfor %}
                 </div>
             </div>
@@ -75,7 +75,7 @@
                         <div class="row">          
                             <div class="btn-group ">
                                 {% for i in range(10) %}
-                                    <button type="button" onclick="update_number(2, {{i + j * 10}})"  class="btn btn-lg btn-secondary mr-1" name="button_number_{{ '{num:02d}'.format(num=i + j * 10) }}" id="button_number_{{ '{num:02d}'.format(num=i + j * 10) }}">{{ '{num:02d}'.format(num=i + j * 10) }}</button>
+                                    <button type="button" onclick="update_number(2, {{i + j * 10}})"  class="btn_number btn btn-lg btn-secondary mr-1" name="button_number_{{ '{num:02d}'.format(num=i + j * 10) }}" id="button_number_{{ '{num:02d}'.format(num=i + j * 10) }}">{{ '{num:02d}'.format(num=i + j * 10) }}</button>
                                 {% endfor %}
                             </div>
                         </div>
@@ -97,7 +97,6 @@
             resize_buttons();
             $.post('/check_login', {
             }).done(function(response) {
-                console.log(response)
                 if (response != 'logged in') {
                     $('#submit').hide()
                 }
