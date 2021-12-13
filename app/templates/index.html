@@ -8,6 +8,7 @@
         }
     </style>
     <div class="p-1 text-center bg-light">
+        <title>AutoP</title>
         <h1>Bienvenidos a los décimos de Ildefonso</h1>
         <h3>Colecciono décimos de loteria y en los botones de arriba podeis ver dos mi colecciones</h3>
         <h3>Y si quieres dejarme un comentario, aquí puedes hacerlo</h3>
@@ -16,12 +17,32 @@
     <script type="text/javascript">
         $(document).ready(function() {
             $("#submit").addClass("btn-info my-4")
+            $("#submit").parent().addClass("col-sm-12")
+            $("#submit").parent().removeClass("col-sm-8")
+            $("#submit").parent().css('text-align','right');
         });
+        $(window).resize(function() {
+            if ($(window).width() > 1200) {
+                $("#container").removeClass('container-fluid').addClass('container');
+            }
+            else{
+                $("#container").addClass('container-fluid').removeClass('container');
+            }
+            if ($(window).width() > 575) {
+                $("#number_info_posts").after($("#number_info_form"));
+                $("#number_info_posts").addClass('border-right');
+            }
+            else {
+                $("#number_info_posts").removeClass('border-right');
+                $("#number_info_form").after($("#number_info_posts"));
+            }
+        });
+
     </script>
 
-    <div class="container-fluid my-3 ">
-        <div class="row">
-            <div id="number_info" class="col-sm-7 px-2 border-left border-secondary">
+    <div id="container" class="container-fluid my-3">
+        <div id="row" class="row">
+            <div id="number_info_posts" class="col-sm-7 px-2 border-right border-secondary">
 
                 <div class="p-2 text-center bg-light" style="margin-top: 20px; margin-bottom: 20px;">
                     <h3>Últimos comentarios</h3>
@@ -37,7 +58,7 @@
                 <br>
                 {% endfor %}
             </div>
-            <div id="number_info" class="col-sm-4 px-2">
+            <div id="number_info_form" class="col-sm-4 px-2">
                 {{ wtf.quick_form(form, horizontal_columns=('sm', 4, 8), form_type='horizontal') }}
             </div>
         </div>

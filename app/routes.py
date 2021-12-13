@@ -298,7 +298,8 @@ def load_image():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    if request.form['password'] == 'asd':
+    print(request.form['password'])
+    if request.form['password'] == '2Galletas!':
         session['logged_in'] = True
     return request.referrer.split('/')[-1]
 

@@ -113,7 +113,9 @@
             }).fail(function() {
                 console.log("Error in backend")
             });
-            $("#submit_save").addClass("btn-info my-0")
+            $("#submit_save").addClass("btn-info my-0");
+            $("#submit_save").parent().addClass("col-sm-12");
+            $("#submit_save").parent().removeClass("col-sm-8");
 
         });
         function load_all_retailers(owned=false) {
