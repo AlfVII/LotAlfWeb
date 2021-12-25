@@ -53,7 +53,7 @@ def retailers_collection():
         towns = local_db_inst.get_all_towns(session.get('retailer_province').upper())
         form.retailer_town.choices = [(town.title(), town.title()) for town in towns]
 
-    if form.validate_on_submit():
+    if form.validate_on_submit() and 'logged_in' in session and session['logged_in']:
         data = form.data
         if os.path.isfile("/tmp/image.jpg"):
             with open("/tmp/image.jpg", "rb") as image_file:
@@ -71,7 +71,7 @@ def retailers_collection():
             retailers_collection_db_inst.delete_retailer(data)
         retailers_collection_db_inst.close_connection()
 
-        retailers = pandas.DataFrame(data, index=[0], columns=["id", "retailer_number", "retailer_street", "retailer_street_number", "retailer_postal_code", "retailer_town", "retailer_telephone", "retailer_longitude", "retailer_latitude", "retailer_province", "retailer_region", "number"])
+        retailers = pandas.DataFrame(data, index=[0], columns=["id", "retailer_number", "retailer_street", "retailer_street_number", "retailer_postal_code", "retailer_town", "retailer_telephone", "retailer_longitude", "retailer_latitude", "retailer_province", "retailer_region", "retailer_name", "retailer_email"])
         retailers = retailers.set_index("id")
         return render_template('retailers_collection.html', form=form, latitude=initial_latitude, longitude=initial_longitude, markers=create_marker(retailers, data['owned'] == "Owned"))
     else:
@@ -103,7 +103,7 @@ def create_marker(retailers, owned):
         else:
             icon = "{icon: my_marker_not}"
         markers += f"var _{row_index} = L.marker([{row['retailer_latitude']}, {row['retailer_longitude']}], {icon});\
-                     _{row_index}.on('click', click_on_marker).bindPopup('{row['retailer_region']}<br>{row['retailer_province']}<br>{row['retailer_town']}<br>{row['retailer_number']}<br>{row['retailer_street']}<br>{row['retailer_street_number']}<br>{row['retailer_postal_code']}<br>{row['retailer_telephone']}<br>{row['number']}');\
+                     _{row_index}.on('click', click_on_marker).bindPopup('{row['retailer_region']}<br>{row['retailer_province']}<br>{row['retailer_town']}<br>{row['retailer_number']}<br>{row['retailer_name']}<br>{row['retailer_street']}<br>{row['retailer_street_number']}<br>{row['retailer_postal_code']}<br>{row['retailer_telephone']}<br>{row['retailer_email']}<br>{row['number']}');\
                      markerClusters_{owned}.addLayer( _{row_index} );"
     markers += f"map.addLayer( markerClusters_{owned} );"
 
@@ -120,12 +120,12 @@ def get_retailer_data():
         retailers_collection_db_inst.close_connection()
         if len(owned_retailers) == 0:
             if len(retailers) != 0:
-                retailers = pandas.DataFrame(retailers, columns=["id", "retailer_number", "retailer_street", "retailer_street_number", "retailer_postal_code", "retailer_town", "retailer_telephone", "retailer_longitude", "retailer_latitude", "retailer_province", "retailer_region"])
+                retailers = pandas.DataFrame(retailers, columns=["id", "retailer_number", "retailer_street", "retailer_street_number", "retailer_postal_code", "retailer_town", "retailer_telephone", "retailer_longitude", "retailer_latitude", "retailer_province", "retailer_region", "retailer_name", "retailer_email"])
                 return make_response(json.dumps(retailers.iloc[0].to_dict()))
             else:
                 return make_response(json.dumps(None))
         else:
-            owned_retailers = pandas.DataFrame(owned_retailers, columns=["id", "retailer_number", "retailer_street", "retailer_street_number", "retailer_postal_code", "retailer_town", "retailer_telephone", "retailer_longitude", "retailer_latitude", "retailer_province", "retailer_region"])
+            owned_retailers = pandas.DataFrame(owned_retailers, columns=["id", "retailer_number", "retailer_street", "retailer_street_number", "retailer_postal_code", "retailer_town", "retailer_telephone", "retailer_longitude", "retailer_latitude", "retailer_province", "retailer_region", "retailer_name", "retailer_email"])
             return make_response(json.dumps(owned_retailers.iloc[0].to_dict()))
 
 
@@ -162,7 +162,7 @@ def update_map():
             owned_retailers = retailers_collection_db_inst.get_retailers(['retailer_province', 'retailer_town', 'retailer_number'], [request.form['retailer_province'], request.form['retailer_town'], request.form['retailer_number']])
 
     retailers_collection_db_inst.close_connection()
-    retailers = pandas.DataFrame(retailers, columns=["id", "retailer_number", "retailer_street", "retailer_street_number", "retailer_postal_code", "retailer_town", "retailer_telephone", "retailer_longitude", "retailer_latitude", "retailer_province", "retailer_region"])
+    retailers = pandas.DataFrame(retailers, columns=["id", "retailer_number", "retailer_street", "retailer_street_number", "retailer_postal_code", "retailer_town", "retailer_telephone", "retailer_longitude", "retailer_latitude", "retailer_province", "retailer_region", "retailer_name", "retailer_email"])
     retailers[["retailer_street", "retailer_street_number", "retailer_town", "retailer_province", "retailer_region"]] = retailers[["retailer_street", "retailer_street_number", "retailer_town", "retailer_province", "retailer_region"]].apply(lambda column: column.str.title())
     retailers = retailers.set_index(['retailer_province', 'retailer_town', 'retailer_number'])
     owned_retailers = owned_retailers.set_index(['retailer_province', 'retailer_town', 'retailer_number'])
@@ -201,7 +201,7 @@ def numbers_collection():
     if session.get('current_number') is not None:
         current_number = int(session.get('current_number'))
 
-    if form.validate_on_submit():
+    if form.validate_on_submit() and 'logged_in' in session and session['logged_in']:
         numbers_collection_db_inst = numbers_collection_db.NumbersCollectionDB()
         datum = {
             'status': form.status.data,

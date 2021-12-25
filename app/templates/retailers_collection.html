@@ -64,6 +64,19 @@
     }
 
 
+    .col-form-label {
+      font-size: 14px;
+    }
+ 
+    .form-control {
+      font-size: 14px;
+    }
+ 
+    label {
+        font-size: 14px;
+        margin:0px;
+    }
+
     </style>
 
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
@@ -149,6 +162,8 @@
             set_value_or_default('retailer_street_number', datum['retailer_street_number'])
             set_value_or_default('retailer_postal_code', datum['retailer_postal_code'], title=false)
             set_value_or_default('retailer_telephone', datum['retailer_telephone'], title=false)
+            set_value_or_default('retailer_email', datum['retailer_email'], title=false)
+            set_value_or_default('retailer_name', datum['retailer_name'], title=false)
             if ('number' in datum){
                 if (datum['number'] != "<NA>") {
                     set_value_or_default('number', datum['number'])
@@ -188,6 +203,8 @@
             $('#retailer_street_number').val('');
             $('#retailer_postal_code').val('');
             $('#retailer_telephone').val('');
+            $('#retailer_name').val('');
+            $('#retailer_email').val('');
             $('#number').val('');
             $('input:radio[name=owned]').filter('[value="Not owned"]').prop('checked', true);
             $('#retailer_latitude').val('');
@@ -202,11 +219,13 @@
             datum['retailer_province'] = content[1]
             datum['retailer_town'] = content[2]
             datum['retailer_number'] = content[3]
-            datum['retailer_street'] = content[4]
-            datum['retailer_street_number'] = content[5]
-            datum['retailer_postal_code'] = content[6]
-            datum['retailer_telephone'] = content[7]
-            datum['number'] = content[8]
+            datum['retailer_name'] = content[4]
+            datum['retailer_street'] = content[5]
+            datum['retailer_street_number'] = content[6]
+            datum['retailer_postal_code'] = content[7]
+            datum['retailer_telephone'] = content[8]
+            datum['retailer_email'] = content[9]
+            datum['number'] = content[10]
             datum['retailer_latitude'] = this.getLatLng().lat;
             datum['retailer_longitude'] = this.getLatLng().lng;
             update_session_multi(['retailer_region', 'retailer_province', 'retailer_town'], [datum['retailer_region'], datum['retailer_province'], datum['retailer_town']]);
@@ -319,7 +338,7 @@
         });
 
     </script>
-    <div class="container-fluid my-3 ">
+    <div class="container-fluid mt-2 ">
         <div class="row">
             <div class="col-sm-3">
                 {{ wtf.quick_form(form, horizontal_columns=('sm', 4, 8), form_type='horizontal') }}
