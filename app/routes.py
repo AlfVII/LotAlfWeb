@@ -53,7 +53,7 @@ def retailers_collection():
         towns = local_db_inst.get_all_towns(session.get('retailer_province').upper())
         form.retailer_town.choices = [(town.title(), town.title()) for town in towns]
 
-    if form.validate_on_submit() and 'logged_in' in session and session['logged_in']:
+    if 'logged_in' in session and session['logged_in'] and form.validate_on_submit():
         data = form.data
         if os.path.isfile("/tmp/image.jpg"):
             with open("/tmp/image.jpg", "rb") as image_file:
@@ -201,7 +201,7 @@ def numbers_collection():
     if session.get('current_number') is not None:
         current_number = int(session.get('current_number'))
 
-    if form.validate_on_submit() and 'logged_in' in session and session['logged_in']:
+    if 'logged_in' in session and session['logged_in'] and form.validate_on_submit():
         numbers_collection_db_inst = numbers_collection_db.NumbersCollectionDB()
         datum = {
             'status': form.status.data,
