@@ -20,8 +20,6 @@ function resize_buttons() {
 }
 
 var update_number_enabled = true;
-console.log("update_number_enabled")
-console.log(update_number_enabled)
 var update_colors_enabled = true;
 
 function update_colors(number) {
@@ -36,7 +34,7 @@ function update_colors(number) {
             response = JSON.parse(response)
 
             for (var i = 0; i < response.length; i++){
-                $("#button_number_" + pad(i, 2)).removeClass('btn-success ').removeClass('btn-secondary ').removeClass('btn-warning ');
+                $("#button_number_" + pad(i, 2)).removeClass('btn-success ').removeClass('btn-secondary ').removeClass('btn-warning ').removeClass('btn-info ');
                 if (response[i] == "Perfecto") {
                     $("#button_number_" + pad(i, 2)).addClass('btn-success ');
                 }
@@ -45,6 +43,9 @@ function update_colors(number) {
                 }
                 else if (response[i] == "Falta") {
                     $("#button_number_" + pad(i, 2)).addClass('btn-secondary ');
+                }
+                else if (response[i] == "Faltan Datos") {
+                    $("#button_number_" + pad(i, 2)).addClass('btn-info ');
                 }
 
             }
@@ -113,8 +114,6 @@ function set_value_or_default(key, value, title=true) {
 function update_number(exp, number) {
     if (update_number_enabled & update_colors_enabled) {
         update_number_enabled = false;
-        console.log("update_number_enabled")
-        console.log(update_number_enabled)
         var current_number = $("#current_number").text();
         if (exp == null){
             new_number = $('#search_number').val();
@@ -146,8 +145,6 @@ function update_number(exp, number) {
             $("#number_info").html(form_html);
             $("#status").val(toTitleCase(response['status']));
             set_value_or_default('origin', response['origin'])
-            console.log(response);
-            console.log(response['lot']);
             if (response['lot'] != null) {
                 response['lot'] = response['lot'].split('/')[0];
             }
@@ -165,14 +162,10 @@ function update_number(exp, number) {
             $("#retailer_number").val(response['retailer_number']);
             $("#copies").val(response['copies']);
             update_number_enabled = true;
-            console.log("update_number_enabled")
-            console.log(update_number_enabled)
 
         }).fail(function() {
             $("#number_info").html("Error getting " + new_number);
             update_number_enabled = true;
-            console.log("update_number_enabled")
-            console.log(update_number_enabled)
         });
 
         if ((exp > 2) | (exp == null)){

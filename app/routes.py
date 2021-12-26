@@ -263,6 +263,8 @@ def update_towns():
 def get_existing_in_hundred():
     numbers_collection_db_inst = numbers_collection_db.NumbersCollectionDB()
     hundred = numbers_collection_db_inst.get_hundred(request.form['number'])
+    missing_data_indexes = hundred[hundred[['origin', 'lot', 'year', 'coin', 'retailer_province', 'retailer_town', 'retailer_number']].isnull().any(axis=1)].index.to_list()
+    hundred.loc[missing_data_indexes, 'status'] = "Faltan Datos"
     response = make_response(json.dumps(hundred['status'].to_list()))
     response.content_type = 'application/jsons'
     return response
