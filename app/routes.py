@@ -47,10 +47,10 @@ def retailers_collection():
     local_db_inst = local_db.LocalDB()
 
     if session.get('retailer_region') is not None:
-        provinces = local_db_inst.get_all_provinces(session.get('retailer_region').upper())
+        provinces = local_db_inst.get_all_provinces(session.get('retailer_region').title())
         form.retailer_province.choices = [(province.title(), province.title()) for province in provinces]
     if session.get('retailer_province') is not None:
-        towns = local_db_inst.get_all_towns(session.get('retailer_province').upper())
+        towns = local_db_inst.get_all_towns(session.get('retailer_province').title())
         form.retailer_town.choices = [(town.title(), town.title()) for town in towns]
 
     if 'logged_in' in session and session['logged_in'] and form.validate_on_submit():
@@ -116,7 +116,7 @@ def get_retailer_data():
         retailers_collection_db_inst = retailers_collection_db.RetailersCollectionDB()
         local_db_inst = local_db.LocalDB()
         owned_retailers = retailers_collection_db_inst.get_retailers(['retailer_province', 'retailer_town', 'retailer_number'], [request.form['retailer_province'], request.form['retailer_town'], request.form['retailer_number']])
-        retailers = local_db_inst.get_retailers(['retailer_province', 'retailer_town', 'retailer_number'], [request.form['retailer_province'].upper(), request.form['retailer_town'].upper(), request.form['retailer_number'].upper()])
+        retailers = local_db_inst.get_retailers(['retailer_province', 'retailer_town', 'retailer_number'], [request.form['retailer_province'].title(), request.form['retailer_town'].title(), request.form['retailer_number'].title()])
         retailers_collection_db_inst.close_connection()
         if len(owned_retailers) == 0:
             if len(retailers) != 0:
@@ -143,22 +143,22 @@ def update_map():
             retailers = []
             owned_retailers = retailers_collection_db_inst.get_all_retailers()
         elif request.form['retailer_town'] != '' and 'retailer_province' not in request.form:
-            retailers = local_db_inst.get_retailers_like(['retailer_town'], [request.form['retailer_town'].upper()])
+            retailers = local_db_inst.get_retailers_like(['retailer_town'], [request.form['retailer_town'].title()])
             owned_retailers = retailers_collection_db_inst.get_retailers_like(['retailer_town'], [request.form['retailer_town']])
         elif request.form['retailer_number'] != '' and 'retailer_province' not in request.form:
-            retailers = local_db_inst.get_retailers(['retailer_number'], [request.form['retailer_number'].upper()])
+            retailers = local_db_inst.get_retailers(['retailer_number'], [request.form['retailer_number'].title()])
             owned_retailers = retailers_collection_db_inst.get_retailers(['retailer_number'], [request.form['retailer_number']])
         elif request.form['retailer_region'] != '' and request.form['retailer_province'] == '':
-            retailers = local_db_inst.get_retailers(['retailer_region'], [request.form['retailer_region'].upper()])
+            retailers = local_db_inst.get_retailers(['retailer_region'], [request.form['retailer_region'].title()])
             owned_retailers = retailers_collection_db_inst.get_retailers(['retailer_region'], [request.form['retailer_region']])
         elif request.form['retailer_province'] != '' and request.form['retailer_town'] == '':
-            retailers = local_db_inst.get_retailers(['retailer_province'], [request.form['retailer_province'].upper()])
+            retailers = local_db_inst.get_retailers(['retailer_province'], [request.form['retailer_province'].title()])
             owned_retailers = retailers_collection_db_inst.get_retailers(['retailer_province'], [request.form['retailer_province']])
         elif request.form['retailer_town'] != '' and request.form['retailer_number'] == '':
-            retailers = local_db_inst.get_retailers(['retailer_province', 'retailer_town'], [request.form['retailer_province'].upper(), request.form['retailer_town'].upper()])
+            retailers = local_db_inst.get_retailers(['retailer_province', 'retailer_town'], [request.form['retailer_province'].title(), request.form['retailer_town'].title()])
             owned_retailers = retailers_collection_db_inst.get_retailers(['retailer_province', 'retailer_town'], [request.form['retailer_province'], request.form['retailer_town']])
         elif request.form['retailer_town'] != '' and request.form['retailer_number'] != '':
-            retailers = local_db_inst.get_retailers(['retailer_province', 'retailer_town', 'retailer_number'], [request.form['retailer_province'].upper(), request.form['retailer_town'].upper(), request.form['retailer_number'].upper()])
+            retailers = local_db_inst.get_retailers(['retailer_province', 'retailer_town', 'retailer_number'], [request.form['retailer_province'].title(), request.form['retailer_town'].title(), request.form['retailer_number'].title()])
             owned_retailers = retailers_collection_db_inst.get_retailers(['retailer_province', 'retailer_town', 'retailer_number'], [request.form['retailer_province'], request.form['retailer_town'], request.form['retailer_number']])
 
     retailers_collection_db_inst.close_connection()
@@ -193,10 +193,10 @@ def numbers_collection():
     form = NumberForm()
     local_db_inst = local_db.LocalDB()
     if session.get('retailer_region') is not None:
-        provinces = local_db_inst.get_all_provinces(session.get('retailer_region').upper())
+        provinces = local_db_inst.get_all_provinces(session.get('retailer_region').title())
         form.retailer_province.choices = [(province.title(), province.title()) for province in provinces]
     if session.get('retailer_province') is not None:
-        towns = local_db_inst.get_all_towns(session.get('retailer_province').upper())
+        towns = local_db_inst.get_all_towns(session.get('retailer_province').title())
         form.retailer_town.choices = [(town.title(), town.title()) for town in towns]
     if session.get('current_number') is not None:
         current_number = int(session.get('current_number'))
@@ -244,7 +244,7 @@ def get_number():
 @app.route('/update_provinces', methods=['POST'])
 def update_provinces():
     local_db_inst = local_db.LocalDB()
-    provinces = local_db_inst.get_all_provinces(request.form['new_region'].upper())
+    provinces = local_db_inst.get_all_provinces(request.form['new_region'].title())
     response = make_response(json.dumps(provinces))
     response.content_type = 'application/jsons'
     return response
@@ -253,7 +253,7 @@ def update_provinces():
 @app.route('/update_towns', methods=['POST'])
 def update_towns():
     local_db_inst = local_db.LocalDB()
-    provinces = local_db_inst.get_all_towns(request.form['new_province'].upper())
+    provinces = local_db_inst.get_all_towns(request.form['new_province'].title())
     response = make_response(json.dumps(provinces))
     response.content_type = 'application/jsons'
     return response
