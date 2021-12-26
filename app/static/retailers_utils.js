@@ -146,8 +146,9 @@ function update_number(exp, number) {
             $("#number_info").html(form_html);
             $("#status").val(toTitleCase(response['status']));
             set_value_or_default('origin', response['origin'])
-            if response['lot'] != null:
+            if (response['lot'] != null) {
                 response['lot'] = response['lot'].split('/')[0];
+            }
             set_value_or_default('lot', response['lot'])
             set_value_or_default('year', response['year'], title=false)
             set_value_or_default('coin', response['coin'])
