@@ -146,6 +146,8 @@ function update_number(exp, number) {
             $("#number_info").html(form_html);
             $("#status").val(toTitleCase(response['status']));
             set_value_or_default('origin', response['origin'])
+            console.log(response);
+            console.log(response['lot']);
             if (response['lot'] != null) {
                 response['lot'] = response['lot'].split('/')[0];
             }
