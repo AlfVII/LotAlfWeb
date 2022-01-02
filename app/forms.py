@@ -44,11 +44,11 @@ class NumberForm(FlaskForm):
     statuses = ['Perfecto', 'Defectuoso', 'Falta']
     coins = ['Selecciona la moneda', 'Euro', 'Peseta']
     initial_year = 1967
-    maximum_lot = 105
+    maximum_lot = 102
     origins = ['Selecciona el origen', 'Ordinario', 'Navidad', 'Extraordinario', 'Especial', 'Niño', 'Antiguo', 'Jueves', 'Escrito']
     retailer_regions = regions
     retailer_regions.insert(0, "Selecciona la comunidad")
-    lot_choices = [(x, x) for x in range(1, maximum_lot + 2)]
+    lot_choices = [(x, x) for x in range(1, maximum_lot + 1)]
     lot_choices.insert(0, ("Default", "Selecciona el sorteo"))
     year_choices = [(x, x) for x in range(initial_year, datetime.now().year + 1)]
     year_choices.insert(0, ("Default", "Selecciona el año"))
@@ -84,15 +84,15 @@ class RetailerForm(FlaskForm):
     retailer_province = SelectField(u'Provincia', validators=[Optional()])
     retailer_town = SelectField(u'Municipio', validators=[Optional()])
     retailer_number = IntegerField(u'Número', validators=[Optional()])
-    retailer_name = IntegerField(u'Nombre', validators=[Optional()])
+    retailer_name = TextAreaField(u'Nombre', validators=[Optional()])
     retailer_street = TextAreaField(u'Calle', validators=[Optional()], render_kw={"rows": 1})
     retailer_street_number = TextAreaField(u'Nº de calle', validators=[Optional()], render_kw={"rows": 1})
     retailer_postal_code = IntegerField(u'Cód. postal', validators=[Optional()])
     retailer_telephone = IntegerField(u'Nº telefono', validators=[Optional()])
-    retailer_email = IntegerField(u'Correo elec.', validators=[Optional()])
+    retailer_email = EmailField(u'Correo elec.', validators=[Optional()])
     retailer_latitude = FloatField(u'Latitud', validators=[Optional()])
     retailer_longitude = FloatField(u'Longitud', validators=[Optional()])
 
-    number = IntegerField(u'Nº lotería', validators=[RequiredIf(owned='Owned')])
+    number = IntegerField(u'Nº lotería', validators=[Optional()])
     owned = RadioField(u'', choices=[("Owned", "Está en la colección"), ("Not owned", "Falta la colección")], validators=[Optional()])
     submit_save = SubmitField('Guardar')

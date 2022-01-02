@@ -225,6 +225,24 @@
             datum['retailer_postal_code'] = content[7]
             datum['retailer_telephone'] = content[8]
             datum['retailer_email'] = content[9]
+            if (datum['retailer_email'] == ''){
+                datum['retailer_email'] = ' '
+            }
+            if (datum['retailer_name'] == ''){
+                datum['retailer_name'] = ' '
+            }
+            if (datum['retailer_email'] == 'None'){
+                datum['retailer_email'] = ' '
+            }
+            if (datum['retailer_name'] == 'None'){
+                datum['retailer_name'] = ' '
+            }
+            if (datum['retailer_email'] == '<NA>'){
+                datum['retailer_email'] = ' '
+            }
+            if (datum['retailer_name'] == '<NA>'){
+                datum['retailer_name'] = ' '
+            }
             datum['number'] = content[10]
             datum['retailer_latitude'] = this.getLatLng().lat;
             datum['retailer_longitude'] = this.getLatLng().lng;
@@ -367,7 +385,7 @@
 
     <script>
         const constraints = {
-            video: { width: { exact: 640 }, height: { exact: 450 } },
+            video: { width: { exact: 640 }, height: { maximum: 450 } },
         };
         // const screenshotButton = document.querySelector("#screenshot-button");
         // const img = document.querySelector("#screenshot img");

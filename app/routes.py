@@ -71,8 +71,9 @@ def retailers_collection():
             retailers_collection_db_inst.delete_retailer(data)
         retailers_collection_db_inst.close_connection()
 
-        retailers = pandas.DataFrame(data, index=[0], columns=["id", "retailer_number", "retailer_street", "retailer_street_number", "retailer_postal_code", "retailer_town", "retailer_telephone", "retailer_longitude", "retailer_latitude", "retailer_province", "retailer_region", "retailer_name", "retailer_email"])
+        retailers = pandas.DataFrame(data, index=[0], columns=["id", "retailer_number", "retailer_street", "retailer_street_number", "retailer_postal_code", "retailer_town", "retailer_telephone", "retailer_longitude", "retailer_latitude", "retailer_province", "retailer_region", "retailer_name", "retailer_email", "number"])
         retailers = retailers.set_index("id")
+        retailers = retailers.fillna(' ')
         return render_template('retailers_collection.html', form=form, latitude=initial_latitude, longitude=initial_longitude, markers=create_marker(retailers, data['owned'] == "Owned"))
     else:
         return render_template('retailers_collection.html', form=form, latitude=initial_latitude, longitude=initial_longitude, markers='')
