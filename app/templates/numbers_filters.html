@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+{% import 'wtf.html' as wtf %}
+{% block app_content %}
+    <style type="text/css" media="screen">
+    .btn-group-vertical > button{
+        margin-bottom:5px;
+    }
+    .btn-group > button{
+        margin-bottom:4px;
+    }
+
+    .loading {
+        position:absolute;
+        left: 50%; 
+        top: 50%;
+        width: 30px;
+        height: 30px;
+    }
+    span {
+        display: inline-flex;
+        align-items: center;
+    }   
+
+    .group_label {
+      display: flex;
+      justify-content: center;
+    }
+
+
+
+    </style>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="btn btn-outline-secondary mx-2" href="{{ url_for('numbers_collection') }}">Colección de números</a>
+                </li>
+                <li class="nav-item">
+                    <a class="btn btn-outline-secondary mx-2" href="{{ url_for('numbers_statistics') }}">Estadísticas</a>
+                </li>
+                <li class="nav-item">
+                    <a class="btn btn-outline-secondary mx-2" href="{{ url_for('numbers_filters') }}">Busqueda por filtros</a>
+                </li>
+            </ul>
+        </div>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <label class="navbar-brand justify-content-center" id="current_number">{{ '{num:05d}'.format(num=current_number) }}</label>
+                </li>
+            </ul>
+        </div>
+        <form class="form-inline">
+          <input class="form-control mr-sm-2" type="search" placeholder="Buscar número" aria-label="Buscar" id="search_number">
+          <button class="btn btn-outline-dark my-2 my-sm-0" type="button" onclick="update_number(null, null)">Buscar</button>
+        </form>
+    </nav>
+    <div class="container-fluid my-3 ">
+        <div class="row">
+            <div class="col-sm-4" id="filter_container">
+                <div class="form-inline">
+                    <input class="form-control mr-sm-2" type="search" value="100" id="filter_limit">
+                    <button class="btn btn-outline-secondary m-2" type="button btn-outline-dark" onclick="get_filtered_list()" name="filter_button">Filtrar</button>
+                </div>
+
+            </div>
+            <div class="col-sm-5" id="number_list_wrapper">
+                <label class="group_label">Lista de números</label>
+                <div class="btn-group-vertical" role="group">
+                    <div class="container-fluid overflow-auto" style="max-height: 450px" id="filtered_list"></div>
+
+                </div>
+            </div>
+            <div id="number_info" class="col-sm-3 px-2 border-left border-secondary">
+                {{ wtf.quick_form(form, horizontal_columns=('sm', 4, 8), form_type='horizontal') }}
+            </div>
+        </div>
+    </div>
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script type="text/javascript" src='./static/retailers_utils.js'></script>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $("#filter_container").prepend(add_filter("copies", "Copias"))
+            $("#filter_container").prepend(add_filter("retailer_number", "Número"))
+            $("#filter_container").prepend(add_filter("retailer_town", "Municipio"))
+            $("#filter_container").prepend(add_filter("retailer_province", "Provincia"))
+            $("#filter_container").prepend(add_filter("retailer_region", "Comunidad"))
+            $("#filter_container").prepend(add_filter("coin", "Moneda"))
+            $("#filter_container").prepend(add_filter("year", "Año"))
+            $("#filter_container").prepend(add_filter("lot", "Sorteo"))
+            $("#filter_container").prepend(add_filter("origin", "Origen"))
+            $("#filter_container").prepend(add_filter("status", "Estado"))
+
+            update_colors($("#current_number").text());
+            resize_buttons();
+            $.post('/check_login', {
+            }).done(function(response) {
+                if (response != 'logged in') {
+                    $('#submit').hide()
+                }
+            }).fail(function() {
+                console.log("Error in backend")
+            });
+            $("#submit").addClass("btn-info my-4");
+            $("#submit").parent().addClass("col-sm-12");
+            $("#submit").parent().removeClass("col-sm-8");
+            $("#submit").parent().css('text-align','right');
+        });
+        $(window).resize(function() {
+            resize_buttons();
+        });
+
+        $(document).on('change','.slider_filter',function(){
+            var name = $(this).attr("name").split("slider_filter_")[1];
+            $(`#filter_${name}`).attr("disabled", $(this).val() == 0);
+        });
+        $(document).on('change','#origin',function(){
+            $('select[name="origin"] option[value="Default"]').prop('disabled', true);
+        });
+        $(document).on('change','#lot',function(){
+            $('select[name="lot"] option[value="Default"]').prop('disabled', true);
+        });
+        $(document).on('change','#year',function(){
+            $('select[name="year"] option[value="Default"]').prop('disabled', true);
+        });
+        $(document).on('change','#coin',function(){
+            $('select[name="coin"] option[value="Default"]').prop('disabled', true);
+        });
+        $(document).on('change','#retailer_region',function(){
+            update_session('retailer_region', $(this).find("option:selected").attr('value'));
+            load_provinces($(this).find("option:selected").attr('value'))
+        });
+        $(document).on('change','#retailer_province',function(){
+            update_session('retailer_province', $(this).find("option:selected").attr('value'));
+            load_towns($(this).find("option:selected").attr('value'))
+        });
+        $(document).on('change','#retailer_town',function(){
+            update_session('retailer_town', $(this).find("option:selected").attr('value'));
+        });
+    </script>
+{% endblock %}
