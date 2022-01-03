@@ -22,6 +22,57 @@ function resize_buttons() {
 var update_number_enabled = true;
 var update_colors_enabled = true;
 
+function get_filtered_list() {
+    var filters = []
+    $(`.slider_filter`).each(function(index) {
+        var name = $(this).attr("name").split("slider_filter_")[1]
+        filled_filter = $(this).val();
+        use = (filled_filter == 0) | (filled_filter != 0 & $(`#filter_${name}`).val() != '');
+        if (use) {
+            filter = {"name": name, "filled": filled_filter, "value": $(`#filter_${name}`).val()}
+            filters.push(filter)
+        }
+    });
+    console.log(filters);
+    $("#filtered_list").html(('<img class="loading" src="./static/loading.gif">'))
+    limit = $("#filter_limit").val();
+
+    $.post('/get_filtered_numbers', {
+        filters: JSON.stringify(filters),
+        limit: limit,
+    }).done(function(response) {
+        response = JSON.parse(response)
+        console.log(response)
+
+        html = ''
+        response.forEach(function callback(number) {
+            html += `<button type="button" onclick="update_number(0, ${number})" class="btn_number btn btn-lg btn-secondary ml-1 mb-1" name="button_number_${number}">${number}</button>`
+        });
+        $("#filtered_list").html(html)
+
+    }).fail(function() {
+        $("#hundred_container").html("Error getting existing for " + filters);
+    });
+}
+
+
+function add_filter(name, label) {
+        return `<div class="form-inline">
+            <div class="input-group-prepend">
+                <span class="input-group-text mx-2" style="width:120px">${label}</span>
+                <span class="text mx-2 ">¿Rell.?</span>
+                <span class="text mx-2 ">No</span>
+            </div>
+            <input type="range" class="slider_filter" id="slider_filter_${name}" name="slider_filter_${name}" style="width:40px" min="0" max="1" value=${(name == "status" | name == "copies")? "1" : "0"}>
+            <div class="input-group-append">
+                <span class="text ml-2 mr-3">Sí</span>
+            </div>
+
+            <input type="text" style="text-align:right; width:150px;" class="form-control" id="filter_${name}" name="filter[${name}]">
+        </div>`
+    }
+
+
 function update_colors(number) {
     if (update_colors_enabled) {
         update_colors_enabled = false;
@@ -127,6 +178,10 @@ function update_number(exp, number) {
 
         }
         else {
+            if (exp == 0) {
+                current_number = 0
+            }
+
             var new_number = Math.floor(current_number / Math.pow(10, exp)) * Math.pow(10, exp);
             if (exp > 2) {
                 new_number = new_number + current_number % Math.pow(10, exp - 1);

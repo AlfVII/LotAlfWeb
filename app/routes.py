@@ -44,6 +44,10 @@ def retailers_collection():
             del session['retailer_province']
         if 'retailer_town' in session:
             del session['retailer_town']
+
+        if os.path.isfile("/tmp/image.jpg"):
+            os.remove("/tmp/image.jpg")
+
     local_db_inst = local_db.LocalDB()
 
     if session.get('retailer_region') is not None:
@@ -166,7 +170,9 @@ def update_map():
     retailers = pandas.DataFrame(retailers, columns=["id", "retailer_number", "retailer_street", "retailer_street_number", "retailer_postal_code", "retailer_town", "retailer_telephone", "retailer_longitude", "retailer_latitude", "retailer_province", "retailer_region", "retailer_name", "retailer_email"])
     retailers[["retailer_street", "retailer_street_number", "retailer_town", "retailer_province", "retailer_region"]] = retailers[["retailer_street", "retailer_street_number", "retailer_town", "retailer_province", "retailer_region"]].apply(lambda column: column.str.title())
     retailers = retailers.set_index(['retailer_province', 'retailer_town', 'retailer_number'])
+    retailers['owned'] = False
     owned_retailers = owned_retailers.set_index(['retailer_province', 'retailer_town', 'retailer_number'])
+    owned_retailers['owned'] = True
     retailers['number'] = None
 
     if not retailers.empty:
@@ -181,8 +187,8 @@ def update_map():
     if not retailers.empty:
         # retailers["number"] = retailers.apply(lambda row: "69" if row['retailer_region'] == 'Comunidad De Madrid' else row["number"], axis=1)
 
-        markers = create_marker(retailers[retailers['number'].notnull()], True)
-        markers += create_marker(retailers[retailers['number'].isnull()], False)
+        markers = create_marker(retailers[retailers['owned']], True)
+        markers += create_marker(retailers[~retailers['owned']], False)
         return map(retailers['retailer_latitude'].mean(), retailers['retailer_longitude'].mean(), markers)
     else:
         return map(initial_latitude, initial_longitude)
@@ -227,6 +233,45 @@ def numbers_collection():
     return render_template('numbers_collection.html', current_number=current_number, form=form)
 
 
+@app.route('/numbers_filters', methods=['GET', 'POST'])
+def numbers_filters():
+    current_number = 00000
+    form = NumberForm()
+    local_db_inst = local_db.LocalDB()
+    if session.get('retailer_region') is not None:
+        provinces = local_db_inst.get_all_provinces(session.get('retailer_region').title())
+        form.retailer_province.choices = [(province.title(), province.title()) for province in provinces]
+    if session.get('retailer_province') is not None:
+        towns = local_db_inst.get_all_towns(session.get('retailer_province').title())
+        form.retailer_town.choices = [(town.title(), town.title()) for town in towns]
+    if session.get('current_number') is not None:
+        current_number = int(session.get('current_number'))
+
+    if 'logged_in' in session and session['logged_in'] and form.validate_on_submit():
+        numbers_collection_db_inst = numbers_collection_db.NumbersCollectionDB()
+        datum = {
+            'status': form.status.data,
+            'origin': form.origin.data,
+            'lot': form.lot.data,
+            'year': form.year.data,
+            'coin': form.coin.data,
+            'retailer_region': form.retailer_region.data,
+            'retailer_province': form.retailer_province.data,
+            'retailer_town': form.retailer_town.data,
+            'retailer_number': form.retailer_number.data,
+            'copies': form.copies.data
+        }
+        keys_to_delete = []
+        for k, v in datum.items():
+            if v == 'Default':
+                keys_to_delete.append(k)
+        for k in keys_to_delete:
+            del datum[k]
+
+        numbers_collection_db_inst.update_number(session['current_number'], datum)
+    return render_template('numbers_filters.html', current_number=current_number, form=form)
+
+
 @app.route('/update_session', methods=['POST'])
 def update_session():
     session[request.form['key']] = request.form['value']
@@ -239,6 +284,22 @@ def get_number():
     numbers_collection_db_inst = numbers_collection_db.NumbersCollectionDB()
     number_data = numbers_collection_db_inst.get_number(request.form['new_number'])
     response = make_response(json.dumps(number_data.iloc[0].to_dict()))
+    return response
+
+
+@app.route('/get_filtered_numbers', methods=['POST'])
+def get_filtered_numbers():
+    print(request.form)
+    filters = json.loads(request.form['filters'])
+    if request.form['limit'] != '':
+        limit = json.loads(request.form['limit'])
+    else:
+        limit = None
+
+    numbers_collection_db_inst = numbers_collection_db.NumbersCollectionDB()
+    filtered_number = numbers_collection_db_inst.get_filtered_numbers(filters, limit)
+    response = make_response(json.dumps(filtered_number['number'].to_list()))
+    response.content_type = 'application/jsons'
     return response
 
 

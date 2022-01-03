@@ -28,6 +28,9 @@
                 <li class="nav-item">
                     <a class="btn btn-outline-secondary mx-2" href="{{ url_for('numbers_statistics') }}">Estadísticas</a>
                 </li>
+                <li class="nav-item">
+                    <a class="btn btn-outline-secondary mx-2" href="{{ url_for('numbers_filters') }}">Busqueda por filtros</a>
+                </li>
             </ul>
         </div>
         <div class="collapse navbar-collapse" id="navbarNav">
@@ -45,7 +48,7 @@
     <div class="container-fluid my-3 ">
         <div class="row">
             <div class="col-sm-1">
-                <div class="btn-group-vertical" role="group" aria-label="Basic example">
+                <div class="btn-group-vertical" role="group">
                     <label class="group_label">Dec. millar</label>
                     {% for i in range(10) %}
                         <button type="button" onclick="update_number(5, {{ i * 10000 }})"  class="btn_number btn btn-lg btn-secondary" name="button_number_{{ '{num:05d}'.format(num=i * 10000) }}">{{ '{num:05d}'.format(num=i * 10000) }}</button>
@@ -53,7 +56,7 @@
                 </div>
             </div>
             <div class="col-sm-1">
-                <div class="btn-group-vertical" role="group" aria-label="Basic example">
+                <div class="btn-group-vertical" role="group">
                     <label class="group_label">Millares</label>
                     {% for i in range(10) %}
                         <button type="button" onclick="update_number(4, {{i * 1000}})"  class="btn_number btn btn-lg btn-secondary" name="button_number_{{ '{num:04d}'.format(num=i * 1000) }}">{{ '{num:04d}'.format(num=i * 1000) }}</button>
@@ -61,7 +64,7 @@
                 </div>
             </div>
             <div class="col-sm-1">
-                <div class="btn-group-vertical" role="group" aria-label="Basic example">
+                <div class="btn-group-vertical" role="group">
                     <label class="group_label">Centenas</label>
                     {% for i in range(10) %}
                         <button type="button" onclick="update_number(3, {{i * 100}})"  class="btn_number btn btn-lg btn-secondary" name="button_number_{{ '{num:03d}'.format(num=i * 100) }}">{{ '{num:03d}'.format(num=i * 100) }}</button>

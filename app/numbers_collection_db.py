@@ -2,6 +2,7 @@ import pandas
 import sqlalchemy
 import os
 from sqlalchemy.ext.automap import automap_base
+from sqlalchemy.sql.expression import cast
 
 
 class NumbersCollectionDB():
@@ -20,6 +21,23 @@ class NumbersCollectionDB():
 
         Session = sqlalchemy.orm.sessionmaker(bind=engine)
         self.session = Session()
+
+    def get_filtered_numbers(self, filters, limit):
+        query = self.session.query(self.NumbersCollectionTable.number)
+        for filt in filters:
+            if filt['filled'] == '0':
+                query = query.filter(cast(getattr(self.NumbersCollectionTable, filt['name']), sqlalchemy.String).is_(None))
+                # query = query.filter(cast(getattr(self.NumbersCollectionTable, filt['name']), sqlalchemy.String) != '')
+            else:
+                query = query.filter(cast(getattr(self.NumbersCollectionTable, filt['name']), sqlalchemy.String).like("%" + filt['value'] + "%"))
+
+        query = query.order_by("number")
+        if limit is not None:
+            query = query.limit(limit)
+        print(query.statement.compile(compile_kwargs={"literal_binds": True}))
+
+        data = pandas.read_sql(query.statement, query.session.bind).sort_values(by='number', ascending=True)
+        return data
 
     def get_all_numbers(self):
         query = self.session.query(self.NumbersCollectionTable)

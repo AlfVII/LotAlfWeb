@@ -84,7 +84,7 @@ class RetailerForm(FlaskForm):
     retailer_province = SelectField(u'Provincia', validators=[Optional()])
     retailer_town = SelectField(u'Municipio', validators=[Optional()])
     retailer_number = IntegerField(u'Número', validators=[Optional()])
-    retailer_name = TextAreaField(u'Nombre', validators=[Optional()])
+    retailer_name = TextAreaField(u'Nombre', validators=[Optional()], render_kw={"rows": 1})
     retailer_street = TextAreaField(u'Calle', validators=[Optional()], render_kw={"rows": 1})
     retailer_street_number = TextAreaField(u'Nº de calle', validators=[Optional()], render_kw={"rows": 1})
     retailer_postal_code = IntegerField(u'Cód. postal', validators=[Optional()])
@@ -93,6 +93,6 @@ class RetailerForm(FlaskForm):
     retailer_latitude = FloatField(u'Latitud', validators=[Optional()])
     retailer_longitude = FloatField(u'Longitud', validators=[Optional()])
 
-    number = IntegerField(u'Nº lotería', validators=[Optional()])
+    # number = IntegerField(u'Nº lotería', validators=[Optional()])
     owned = RadioField(u'', choices=[("Owned", "Está en la colección"), ("Not owned", "Falta la colección")], validators=[Optional()])
     submit_save = SubmitField('Guardar')
