@@ -107,10 +107,17 @@
             $("#submit").parent().addClass("col-sm-12");
             $("#submit").parent().removeClass("col-sm-8");
             $("#submit").parent().css('text-align','right');
+
+            $(".slider_filter").each(function() {
+                var name = $(this).attr("name").split("slider_filter_")[1];
+                $(`#filter_${name}`).attr("disabled", $(this).val() == 0);
+            });
+
         });
         $(window).resize(function() {
             resize_buttons();
         });
+
 
         $(document).on('change','.slider_filter',function(){
             var name = $(this).attr("name").split("slider_filter_")[1];
