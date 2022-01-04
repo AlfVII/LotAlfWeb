@@ -63,7 +63,7 @@ function add_filter(name, label) {
                 <span class="text mx-2 ">¿Rell.?</span>
                 <span class="text mx-2 ">No</span>
             </div>
-            <input type="range" class="slider_filter" id="slider_filter_${name}" name="slider_filter_${name}" style="width:40px" min="0" max="1" value=${(name == "status" | name == "copies")? "1" : "0"}>
+            <input type="range" class="slider_filter" id="slider_filter_${name}" name="slider_filter_${name}" style="width:40px" min="0" max="1" value="1"}>
             <div class="input-group-append">
                 <span class="text ml-2 mr-3">Sí</span>
             </div>
