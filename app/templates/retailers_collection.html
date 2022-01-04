@@ -137,6 +137,7 @@
                 all_retailers: !owned,
                 all_owned_retailers: owned
             }).done(function(response) {
+                console.log(response)
                 $("#map_container").html(response);
             }).fail(function() {
                 console.log("Error in backend")
@@ -149,6 +150,7 @@
                 all_owned_retailers: false,
                 retailer_town: $("#search_town").val()
             }).done(function(response) {
+                console.log(response)
                 $("#map_container").html(response);
             }).fail(function() {
                 console.log("Error in backend")

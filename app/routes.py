@@ -107,6 +107,8 @@ def create_marker(retailers, owned):
             icon = "{icon: my_marker_own}"
         else:
             icon = "{icon: my_marker_not}"
+        if isinstance(row['retailer_name'], str):
+            row['retailer_name'] = row['retailer_name'].replace("'", "\\'")
         markers += f"var _{row_index} = L.marker([{row['retailer_latitude']}, {row['retailer_longitude']}], {icon});\
                      _{row_index}.on('click', click_on_marker).bindPopup('{row['retailer_region']}<br>{row['retailer_province']}<br>{row['retailer_town']}<br>{row['retailer_number']}<br>{row['retailer_name']}<br>{row['retailer_street']}<br>{row['retailer_street_number']}<br>{row['retailer_postal_code']}<br>{row['retailer_telephone']}<br>{row['retailer_email']}<br>{row['number']}');\
                      markerClusters_{owned}.addLayer( _{row_index} );"
