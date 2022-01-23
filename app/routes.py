@@ -291,7 +291,6 @@ def get_number():
 
 @app.route('/get_filtered_numbers', methods=['POST'])
 def get_filtered_numbers():
-    print(request.form)
     filters = json.loads(request.form['filters'])
     if request.form['limit'] != '':
         limit = json.loads(request.form['limit'])
@@ -317,8 +316,8 @@ def update_provinces():
 @app.route('/update_towns', methods=['POST'])
 def update_towns():
     local_db_inst = local_db.LocalDB()
-    provinces = local_db_inst.get_all_towns(request.form['new_province'].title())
-    response = make_response(json.dumps(provinces))
+    towns = local_db_inst.get_all_towns(request.form['new_province'].title())
+    response = make_response(json.dumps(towns))
     response.content_type = 'application/jsons'
     return response
 
@@ -364,7 +363,6 @@ def load_image():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    print(request.form['password'])
     if request.form['password'] == '2Galletas!':
         session['logged_in'] = True
     return request.referrer.split('/')[-1]

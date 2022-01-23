@@ -117,7 +117,12 @@ function toTitleCase(str) {
     }
     else {
         return str.replace(/\w\S*/g, function(txt) {
-              return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+                if (txt.charAt(0) == 'L' & txt.charAt(1) == '\'') {
+                    return txt.charAt(0).toUpperCase() + txt.charAt(1).toUpperCase() + txt.charAt(2).toUpperCase() + txt.substr(3).toLowerCase();
+                }
+                else {
+                    return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+                }
             }
         );
     }
