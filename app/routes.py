@@ -397,7 +397,7 @@ def get_count(data, column):
     aux = aux.rename({'': "Sin datos"})
     aux = aux.sort_values(ascending=False)
     datum = collections.OrderedDict()
-    for k, v in aux.iteritems():
+    for k, v in aux.items():
         if k[0] != "Sin datos":
             if isinstance(k[0], str):
                 datum[k[0].title()] = v
@@ -415,7 +415,7 @@ def get_numbers_statistics():
 
     aux = numbers_collection.value_counts(subset=['status'])
     data['numbers_statuses'] = {}
-    for k, v in aux.iteritems():
+    for k, v in aux.items():
         data['numbers_statuses'][k[0]] = v
 
     data['numbers_regions'] = get_count(numbers_collection, 'retailer_region')
