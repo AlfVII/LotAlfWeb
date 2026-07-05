@@ -3,21 +3,28 @@ import { ref, onMounted } from 'vue'
 import { api } from '../api'
 
 const posts = ref([])
-const form = ref({ name: '', email: '', post: '' })
+const form = ref({ name: '', email: '', post: '', website: '' })
 const sending = ref(false)
 const sent = ref(false)
+const error = ref('')
 
 async function load() {
   try { posts.value = await api.comments() } catch (e) { posts.value = [] }
 }
 async function submit() {
+  error.value = ''
   if (!form.value.name || !form.value.email || !form.value.post) return
   sending.value = true
   try {
-    await api.addComment({ name: form.value.name, email: form.value.email, comment: form.value.post })
-    form.value = { name: '', email: '', post: '' }
+    await api.addComment({
+      name: form.value.name, email: form.value.email,
+      comment: form.value.post, website: form.value.website,
+    })
+    form.value = { name: '', email: '', post: '', website: '' }
     sent.value = true
     await load()
+  } catch (e) {
+    error.value = e.message || 'No se pudo enviar el comentario.'
   } finally { sending.value = false }
 }
 onMounted(load)
@@ -90,6 +97,12 @@ onMounted(load)
                 <label class="col-form-label col-sm-4">Mensaje</label>
                 <div class="col-sm-8"><textarea class="form-control" v-model="form.post" rows="4"></textarea></div>
               </div>
+              <!-- honeypot: hidden from humans; bots that fill it are dropped -->
+              <div class="hp-field" aria-hidden="true">
+                <label>No rellenar</label>
+                <input v-model="form.website" type="text" tabindex="-1" autocomplete="off" />
+              </div>
+              <p v-if="error" class="mt-2 mb-0" style="color:#a12; font-size:14px;">{{ error }}</p>
               <div class="form-row mt-3">
                 <div class="col-sm-12 text-right">
                   <button type="submit" class="btn btn-info" :disabled="sending">Añadir comentario</button>
@@ -113,4 +126,6 @@ onMounted(load)
 .fit-body > .row > [class^="col-"] { height: 100%; display: flex; flex-direction: column; min-height: 0; }
 .posts-head { flex: 0 0 auto; }
 .posts-scroll { flex: 1 1 auto; min-height: 0; overflow: auto; padding-right: .4rem; }
+/* honeypot: off-screen, not display:none (some bots skip display:none) */
+.hp-field { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
 </style>
