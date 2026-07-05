@@ -567,7 +567,21 @@ select.form-control{ appearance: auto; }
   opacity: .55;
   cursor: not-allowed;
 }
-#filtered_list{ scrollbar-color: var(--kraft-hondo) var(--papel-prensa); }
+/* Themed scrollbars everywhere — kraft thumb on an album-leaf track, to match
+   the binder look (was default/grey on the Tablón, ficha, etc.). */
+*{
+  scrollbar-width: thin;                                        /* Firefox */
+  scrollbar-color: var(--kraft-hondo) var(--papel-prensa);
+}
+::-webkit-scrollbar{ width: 12px; height: 12px; }
+::-webkit-scrollbar-track{ background: var(--papel-prensa); border-radius: 8px; }
+::-webkit-scrollbar-thumb{
+  background: var(--kraft-hondo);
+  border: 2px solid var(--papel-prensa);                        /* inset padding */
+  border-radius: 8px;
+}
+::-webkit-scrollbar-thumb:hover{ background: var(--nogal); }
+::-webkit-scrollbar-corner{ background: var(--papel-prensa); }
 
 /* =====================================================================
    11. LEAFLET MAP — a mounted map plate with kraft photo-corners
