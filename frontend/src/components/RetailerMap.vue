@@ -17,8 +17,8 @@ function draw() {
   for (const m of props.markers) {
     if (m.lat == null || m.lng == null) continue
     const cm = L.circleMarker([m.lat, m.lng], m.owned
-      ? { radius: 8, color: '#1C1812', weight: 1, fillColor: '#1E4D34', fillOpacity: 0.92 }
-      : { radius: 7, color: '#574231', weight: 1.5, fillColor: '#F4ECD8', fillOpacity: 0.85 })
+      ? { radius: 8, color: '#2B1D14', weight: 1, fillColor: '#C65D2E', fillOpacity: 0.92 }
+      : { radius: 7, color: '#6E7645', weight: 1.5, fillColor: '#F4EAD0', fillOpacity: 0.85 })
     cm.bindPopup(`${esc(m.town)} · Admón nº ${esc(m.number)}<br>${esc(m.name)}`)
     cm.on('click', () => emit('select', m))
     cm.addTo(layer)

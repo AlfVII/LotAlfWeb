@@ -1,317 +1,325 @@
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=EB+Garamond:ital,wght@0,400;0,500;0,600&family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Oswald:wght@500;600;700&family=Martian+Mono:wght@600;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..900;1,9..144,400..700&family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Alegreya:ital,wght@0,400..800;1,400..700&display=swap');
 
 /* =====================================================================
-   Los décimos de Ildefonso — theme.css  ·  v3 "EL ARTE DEL DÉCIMO"
-   "Una colección privada"  ·  Grabado · Décimo · Legible
+   Los décimos de Ildefonso — theme.css  ·  v4 "EL CLASIFICADOR"
+   "Un álbum privado"  ·  Clasificador de anillas · Décimo · Ficha a máquina
    ---------------------------------------------------------------------
-   A pure CSS overlay on Flask + Bootstrap 4.6 (bootstrap-flask).
-   The private album of a retired professor (b. 1955) who collects décimos
-   for their ENGRAVING CRAFT — the orla, the volutas, the guilloché lathe
-   line, the filigrana, the cartelas. We reproduce the FRAME and the LINE,
-   never the picture and never the advertisement. Warm aged security paper,
-   one warm-black/umber engraving ink, a single restrained bottle-green
-   accent. No motion, no marketing, no prize/luck/official wording. The
-   number — the warm-black numbering-machine serial on a perforated ticket —
-   is the only strong note; the engraved orla is the only flourish.
-   No markup contract is changed: every Bootstrap class, WTForms id/name
-   and JS hook is preserved and merely re-skinned.
+   The private ring-binder album of a collector (b. 1955) who has spent a
+   lifetime mounting décimos for the ART of their vignettes and the craft of
+   the administración de lotería they came from. The look is his 1970s–80s
+   world: a kraft binder cover, cream album leaves held under glassine
+   sleeves, kraft photo-corners, coloured index tabs, and fichas typed on a
+   machine with a two-tone ribbon. Warm earth polychrome — burnt orange,
+   mustard, olive, ribbon-red — never a casino, never a prize, never luck.
+   The number is the strong note; the leaf and the typed ficha carry the rest.
+
+   Pure CSS overlay on the Vue + Bootstrap 4.6 markup. Every class, id and
+   CSS custom-property NAME from the previous theme is preserved (the old
+   engraving vocabulary — .orla, .voluta, --verde-botella, etc. — is kept as
+   an alias re-skinned to the album), so no template contract changes.
    ===================================================================== */
 
 /* =====================================================================
-   1. DESIGN TOKENS  (aged paper + engraving ink + ONE green accent)
+   1. DESIGN TOKENS  (kraft binder + album leaf + warm 70s polychrome)
    ===================================================================== */
 :root{
-  /* — Paper: warm aged security stock, never pure white — */
-  --crema:        #F4ECD8;  /* page + card + chip ground (cream security paper) */
-  --crema-alta:   #FBF5E6;  /* raised/reserved panel, navbar field, incise highlight */
-  --papel-prensa: #E6D8B8;  /* deeper panel / foxing / "Faltan datos" tile / paper edge */
-  --marfil:       #F8F2E2;  /* reversed text/numerals on the green accent */
+  /* — Paper: the binder and its leaves — */
+  --cubierta:     #8A6A42;  /* kraft binder cover — the page ground behind the leaves */
+  --cubierta-osc: #79592F;  /* the corduroy shadow stripe of the cover */
+  --pagina:       #F4EAD0;  /* album leaf — card/panel/chip ground (never pure white) */
+  --pagina-alta:  #FBF4E1;  /* glassine sleeve / raised panel / reserved field */
+  --kraft:        #C9A96E;  /* photo-corners, tab grounds, kraft trim */
+  --kraft-hondo:  #B4934F;  /* deeper kraft edge / tab shadow */
+  --kraft-tenue:  #A98D63;  /* faintest kraft hairline — DECORATIVE only, never text */
 
-  /* — Ink: the engraving (warm near-black + umber line) — */
-  --tinta:        #1C1812;  /* body ink, titling, numeral overprint   (~15:1 AAA) */
-  --tinta-sepia:  #574231;  /* engraving LINE + captions + frame rules (~8:1 AAA) */
-  --nogal:        #3A2A1A;  /* deepest umber — outer frame rule, footer, cabinet chrome */
-  --nogal-claro:  #5A3E2B;  /* dividers, soft hairlines, divider ornament */
-  --sepia-tenue:  #8A745C;  /* faintest engraved hairline — DECORATIVE only, never text */
+  /* — Ink: chocolate machine ink + the ribbon — */
+  --choco:        #372518;  /* body ink, titling, numerals            (~11:1 AAA) */
+  --choco-suave:  #6B5138;  /* typed captions, labels, rules          (~6.2:1 AA+) */
+  --nogal:        #2B1D14;  /* dark walnut — outer frames, footer, binder chrome */
+  --nogal-claro:  #3A2A1D;  /* dividers, footer top rule */
 
-  /* — The ONE accent: deep bottle-green FNMT design ink — */
-  --verde-botella:#1E4D34;  /* accent fills (owned tile, map mat), reversed-text ground (~8.2:1) */
-  --verde-claro:  #2E5E3A;  /* the décimo guilloche ink + owned accent line/border  (~6.4:1) */
+  /* — The warm 70s polychrome (period index-tab colours) — */
+  --naranja:      #C65D2E;  /* burnt orange — the primary accent / "en el álbum" */
+  --naranja-hondo:#A8461C;  /* deeper orange — links, hover, text-weight accent (~4.9:1) */
+  --mostaza:      #C6912E;  /* mustard — "con defecto" / warning tab */
+  --oliva:        #6E7645;  /* olive — secondary index tab / owned map disc */
+  --rojo-maquina: #A9432E;  /* two-tone ribbon red — ficha headings, the typed accent */
 
-  /* — Type: engraver's roman + small-caps inscription + reading serif — */
-  --font-display:   "Cormorant Garamond", "Playfair Display", Georgia, serif; /* masthead + H1/H2 */
-  --font-caps:      "EB Garamond", Georgia, serif;      /* small-caps captions/labels/nav/buttons */
-  --font-body:      "Lora", Georgia, serif;             /* the calm reading face */
-  /* — décimo numbering faces (KEPT — the real numbering-machine serial) — */
-  --font-numerador: "Martian Mono", "Oswald", monospace;  /* hero número — numbering machine */
-  --font-chip:      "Oswald", system-ui, sans-serif;      /* two-digit chips — tall, tabular */
+  /* --- Legacy aliases: every old variable NAME kept working, re-skinned --- */
+  --crema:        var(--pagina);         /* was cream security paper → album leaf */
+  --crema-alta:   var(--pagina-alta);    /* was raised panel → glassine sleeve */
+  --papel-prensa: #E7D4AC;               /* deeper tan panel / "faltan datos" tile / edge */
+  --marfil:       #FBF4E1;               /* reversed text/numerals on the warm accents */
+  --tinta:        var(--choco);
+  --tinta-sepia:  var(--choco-suave);
+  --sepia-tenue:  var(--kraft-tenue);
+  --verde-botella:var(--naranja-hondo);  /* the accent-fill / "owned" ink is now burnt orange */
+  --verde-claro:  var(--naranja);        /* the accent line / focus is now burnt orange */
+
+  /* — Type: album masthead serif + typewriter ribbon + reading serif — */
+  --font-display:   "Fraunces", "Playfair Display", Georgia, serif; /* masthead + H1/H2 + big serials */
+  --font-caps:      "Courier Prime", "Courier New", monospace;      /* typed captions/labels/nav/buttons */
+  --font-body:      "Alegreya", Georgia, serif;                     /* the calm reading face */
+  --font-numerador: "Fraunces", Georgia, serif;                     /* hero serial — the mounted number */
+  --font-chip:      "Courier Prime", "Courier New", monospace;      /* two-digit grid chips — tabular typewriter */
   --num-features:   "tnum" 1, "lnum" 1, "calt" 0, "liga" 0;
 
-  /* --- Décimo numeral treatment (the only strong note) --- */
-  --perf-r: 2px;  --perf-s: 9px;   /* perforation radius + pitch (the torn fracción edge) */
-  /* faint verde guilloche security ground for the ticket tiles (opacity baked into the SVG) */
-  --guilloche-decimo: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='40'%3E%3Cg fill='none' stroke='%232E5E3A' stroke-width='0.6' opacity='0.16'%3E%3Cpath d='M0 20 C15 4 45 4 60 20 S105 36 120 20'/%3E%3Cpath d='M0 20 C15 36 45 36 60 20 S105 4 120 20'/%3E%3Cpath d='M0 12 C15 0 45 24 60 12 S105 0 120 12'/%3E%3Cpath d='M0 28 C15 40 45 16 60 28 S105 40 120 28'/%3E%3C/g%3E%3C/svg%3E");
-
-  /* sepia lathe rule used by the navbar / card / footer bands (opacity baked in) */
-  --guilloche-banda: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='10'%3E%3Cg fill='none' stroke='%23574231' stroke-width='0.8' opacity='0.20'%3E%3Cpath d='M0 5 C20 1 40 9 60 5 S100 1 120 5'/%3E%3Cpath d='M0 5 C20 9 40 1 60 5 S100 9 120 5'/%3E%3C/g%3E%3C/svg%3E");
-  /* faint verde guilloche ground for the two engraved orlas (map + photo) */
-  --guilloche-mat: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='24'%3E%3Cg fill='none' stroke='%232E5E3A' stroke-width='0.7' opacity='0.10'%3E%3Cpath d='M0 12 C20 2 40 22 60 12 S100 2 120 12'/%3E%3Cpath d='M0 12 C20 22 40 2 60 12 S100 22 120 12'/%3E%3C/g%3E%3C/svg%3E");
-  /* a single mirrored voluta-and-acanthus corner (used by the engraved orlas) */
-  --voluta-corner: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48'%3E%3Cg fill='none' stroke='%23574231' stroke-width='0.9' stroke-linecap='round'%3E%3Cpath d='M4 44 C4 24 12 8 30 5 C19 9 16 18 19 25 C21 30 27 30 29 25 C30 22 27 19 24 21'/%3E%3Cpath d='M4 30 V8 a4 4 0 0 1 4-4 H30'/%3E%3C/g%3E%3C/svg%3E");
+  /* — Kraft photo-corners (the four mounts of a leaf / mat) — */
+  --corner-tl: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='26' height='26'%3E%3Cpath d='M0 0 H26 L0 26 Z' fill='%23C9A96E'/%3E%3Cpath d='M1 1 H21 L1 21 Z' fill='none' stroke='%236B5138' stroke-width='0.8' opacity='0.55'/%3E%3C/svg%3E");
+  --corner-tr: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='26' height='26'%3E%3Cpath d='M0 0 H26 V26 Z' fill='%23C9A96E'/%3E%3Cpath d='M25 1 H5 V21 Z' fill='none' stroke='%236B5138' stroke-width='0.8' opacity='0.55'/%3E%3C/svg%3E");
+  --corner-bl: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='26' height='26'%3E%3Cpath d='M0 0 V26 H26 Z' fill='%23C9A96E'/%3E%3Cpath d='M1 5 V25 H21 Z' fill='none' stroke='%236B5138' stroke-width='0.8' opacity='0.55'/%3E%3C/svg%3E");
+  --corner-br: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='26' height='26'%3E%3Cpath d='M26 0 V26 H0 Z' fill='%23C9A96E'/%3E%3Cpath d='M25 5 V25 H5 Z' fill='none' stroke='%236B5138' stroke-width='0.8' opacity='0.55'/%3E%3C/svg%3E");
 }
 
 /* =====================================================================
-   2. BASE — warm aged security paper + fine engraving grain
-   (fine grain + low-freq foxing; NO halftone poster screen)
+   2. BASE — the kraft binder cover (vertical corduroy) + leaf paper grain
    ===================================================================== */
 body{
   font-family: var(--font-body);
-  font-size: 19px;            /* base — never below 18px for read text; 17px caption floor */
+  font-size: 19px;            /* base — never below 18px for read text */
   line-height: 1.6;
   color: var(--tinta);
-  background-color: var(--crema);
+  background-color: var(--cubierta);
+  /* the corduroy weave of the binder cover */
+  background-image:
+    repeating-linear-gradient(90deg,
+      rgba(0,0,0,.10) 0 2px, rgba(0,0,0,0) 2px 8px),
+    linear-gradient(180deg, rgba(255,255,255,.04), rgba(0,0,0,.10));
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
 
-/* Aged cream: fine fractalNoise grain + a larger low-frequency foxing layer,
-   luminance→alpha so it only darkens the paper. Fixed, behind all content. */
+/* A faint fibrous grain, luminance→alpha so it only warms/darkens surfaces. */
 body::before{
   content:""; position:fixed; inset:0; z-index:-1; pointer-events:none;
-  opacity:.12; mix-blend-mode:multiply;
-  background-repeat:repeat, repeat;
-  background-size:180px 180px, 360px 360px;
+  opacity:.10; mix-blend-mode:multiply;
+  background-repeat:repeat;
+  background-size:200px 200px;
   background-image:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch' result='n'/%3E%3CfeColorMatrix in='n' type='matrix' values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0.33 0.33 0.33 0 0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23g)'/%3E%3C/svg%3E"),
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='360' height='360'%3E%3Cfilter id='m'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.012' numOctaves='2' stitchTiles='stitch' result='n'/%3E%3CfeColorMatrix in='n' type='matrix' values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0.18 0.18 0.18 0 0'/%3E%3C/filter%3E%3Crect width='360' height='360' filter='url(%23m)'/%3E%3C/svg%3E");
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch' result='n'/%3E%3CfeColorMatrix in='n' type='matrix' values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0.3 0.3 0.3 0 0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23g)'/%3E%3C/svg%3E");
 }
 
-/* Re-soften the generic Bootstrap border utilities into warm engraved hairlines */
+/* Re-soften the generic Bootstrap border utilities into warm kraft hairlines */
 .border,
 .border-top,.border-right,.border-bottom,.border-left,
-.border-secondary{ border-color: rgba(90,62,43,.35) !important; }
+.border-secondary{ border-color: rgba(107,81,56,.35) !important; }
 .border-danger{ border-color: var(--nogal) !important; }   /* danger = walnut, never red */
 
-::selection{ background: rgba(46,94,58,.25); color: var(--tinta); }
-::-moz-selection{ background: rgba(46,94,58,.25); color: var(--tinta); }
+::selection{ background: rgba(198,93,46,.24); color: var(--tinta); }
+::-moz-selection{ background: rgba(198,93,46,.24); color: var(--tinta); }
 
 /* =====================================================================
-   3. HEADINGS — engraved titling (Cormorant Garamond), quiet & centered
+   3. HEADINGS — album masthead titling (Fraunces), warm and confident
    ===================================================================== */
 h1,h2,h3,h4,h5,h6,
 .h1,.h2,.h3,.h4,.h5,.h6{
   font-family: var(--font-display);
   color: var(--nogal);
-  font-weight: 600;
-  letter-spacing: .03em;
-  line-height: 1.2;
+  font-weight: 700;
+  letter-spacing: .005em;
+  line-height: 1.15;
 }
 h1,.h1{
-  color: var(--tinta);
-  font-weight: 600;
+  color: var(--choco);
+  font-weight: 900;
   text-align: center;
-  text-transform: uppercase;
-  letter-spacing: .08em;            /* engraved titling — set quiet, does not advertise */
+  letter-spacing: -.01em;
   font-size: clamp(34px, 5vw, 56px);
-  line-height: 1.08;
+  line-height: 1.02;
 }
 h2,.h2{ font-size: 30px; }
 h3,.h3{ font-size: 25px; }
 h4,.h4{ font-size: 22px; }
 h5,.h5{ font-size: 20px; }
 h6,.h6{ font-size: 18px; }
-.lead{ font-family: var(--font-body); font-style: italic; font-size: 21px; color: var(--tinta-sepia); }
+.lead{ font-family: var(--font-body); font-style: italic; font-size: 21px; color: var(--choco-suave); }
 
-/* The H1 underline becomes the filigree cul-de-lampe divider (§13.2), not a sales bar */
-h1{ position: relative; padding-bottom: .3em; }
+/* The H1 underline becomes a short mounted rule with a ribbon-red centre pip */
+h1{ position: relative; padding-bottom: .28em; }
 h1::after{
-  content:""; display:block; margin:.42em auto 0;
-  width: clamp(200px, 30vw, 260px); height: 16px;
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 16' width='240' height='16'%3E%3Cg fill='none' stroke='%235A3E2B' stroke-width='0.9'%3E%3Cline x1='0' y1='8' x2='96' y2='8'/%3E%3Cline x1='144' y1='8' x2='240' y2='8'/%3E%3Cpath d='M96 8 C104 8 108 3 114 5 C120 7 117 12 111 11 M144 8 C136 8 132 3 126 5 C120 7 123 12 129 11'/%3E%3C/g%3E%3Ccircle cx='120' cy='8' r='1.6' fill='%235A3E2B'/%3E%3C/svg%3E") no-repeat center / contain;
-  opacity:.75;
+  content:""; display:block; margin:.4em auto 0;
+  width: clamp(180px, 26vw, 240px); height: 8px;
+  background:
+    radial-gradient(circle at center, var(--rojo-maquina) 0 3px, transparent 3px) center / 100% 100% no-repeat,
+    linear-gradient(90deg, var(--kraft-hondo) 0 45%, transparent 45% 55%, var(--kraft-hondo) 55% 100%) center / 100% 2px no-repeat;
 }
 
 /* =====================================================================
-   4. NAVBAR — a quiet engraved nameplate (NOT a loud masthead)
-   Cream field; a graded double rule (nogal over a sepia hairline) with a
-   slim guilloche lathe band behind it. No gold clip, no rays, no halftone.
+   4. NAVBAR — the binder's title strip + coloured index tabs
+   Cream leaf strip pinned to the cover; the brand is the album title in
+   heavy Fraunces; the nav links read as kraft index tabs.
    ===================================================================== */
 .navbar.bg-light{
-  background-color: var(--crema-alta) !important;
-  background-image: var(--guilloche-banda);
-  background-repeat: repeat-x;
-  background-position: center bottom;
-  background-size: 120px 10px;
-  border-bottom: 1.5px solid var(--nogal);     /* the heavier rule */
-  padding-top: .55rem; padding-bottom: .55rem;
+  background-color: var(--pagina-alta) !important;
+  border-bottom: 3px solid var(--nogal);
+  box-shadow: 0 2px 0 rgba(0,0,0,.18);
+  padding-top: .5rem; padding-bottom: .5rem;
   position: relative;
 }
-/* the second, finer rule of the graded double — a sepia hairline just below */
-.navbar.bg-light::after{
-  content:""; position:absolute; left:0; right:0; bottom:-3px; height:1px;
-  background: var(--tinta-sepia); opacity:.55; pointer-events:none;
-}
 
-/* Brand — engraved nameplate in Cormorant Garamond small-caps (no gold, no shout) */
+/* Brand — the album title, heavy serif with an italic tail handled in markup */
 .navbar-brand{
   font-family: var(--font-display);
-  font-weight: 600;
-  font-variant-caps: small-caps;
-  letter-spacing: .06em;
-  font-size: 30px;
-  line-height: 1.1;
-  color: var(--tinta) !important;
+  font-weight: 900;
+  letter-spacing: -.01em;
+  font-size: 26px;
+  line-height: 1.05;
+  color: var(--choco) !important;
 }
 .navbar-brand:hover,.navbar-brand:focus{
-  color: var(--verde-botella) !important;
+  color: var(--naranja-hondo) !important;
 }
 
-/* Nav links — small-caps inscription; hover/active = green ink + 2px underline */
+/* Nav links — kraft index tabs in typed capitals; active tab = burnt orange */
 .navbar .nav-link{
-  color: var(--tinta-sepia) !important;
+  color: var(--choco) !important;
   font-family: var(--font-caps);
-  font-variant-caps: small-caps;
-  font-weight: 600;
-  font-size: 19px;
-  letter-spacing: .06em;
-  padding-left: .85rem; padding-right: .85rem;
+  font-weight: 700;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: .03em;
+  white-space: nowrap;
+  padding: .35rem .7rem .4rem !important;
+  margin: 0 .12rem;
+  background: var(--kraft);
+  border: 1.5px solid var(--choco-suave);
+  border-bottom: none;
+  border-radius: 9px 9px 0 0;
+  position: relative; top: 2px;
+  box-shadow: inset 0 -7px 10px -9px rgba(0,0,0,.5);
 }
 .navbar .nav-link:hover,
-.navbar .nav-link:focus,
-.navbar .nav-link.active{
-  color: var(--verde-claro) !important;
-  text-decoration: underline;
-  text-underline-offset: 5px;
-  text-decoration-thickness: 2px;
+.navbar .nav-link:focus{
+  background: var(--kraft-hondo);
+  color: var(--nogal) !important;
+}
+.navbar .nav-link.active,
+.navbar .nav-link.router-link-active{
+  background: var(--naranja) !important;
+  color: var(--marfil) !important;
+  top: 0; padding-bottom: .55rem !important;
 }
 
-/* Mobile collapse toggler — sepia engraved bars */
-.navbar-toggler{ border-color: var(--tinta-sepia) !important; }
+/* Mobile collapse toggler — kraft-outlined, chocolate bars */
+.navbar-toggler{ border-color: var(--choco-suave) !important; }
 .navbar-toggler-icon{
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='30' height='30'%3E%3Cpath stroke='%23574231' stroke-width='2' stroke-linecap='round' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E") !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='30' height='30'%3E%3Cpath stroke='%236B5138' stroke-width='2' stroke-linecap='round' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E") !important;
 }
 
-/* The login password field sits on the cream nameplate */
+/* The login password field sits on the title strip */
 .navbar #edit_mode_password{
-  background: var(--crema);
-  border: 1px solid var(--tinta-sepia);
+  background: var(--pagina);
+  border: 1px solid var(--choco-suave);
   color: var(--tinta);
-  min-height: 48px;
+  font-family: var(--font-caps);
+  font-size: 15px;
+  min-height: 44px;
 }
-.navbar #edit_mode_password::placeholder{ color: var(--tinta-sepia); opacity: 1; }
+.navbar #edit_mode_password::placeholder{ color: var(--choco-suave); opacity: 1; }
 
 /* =====================================================================
-   5. EL NÚMERO HÉROE  (#current_number — the real perforated décimo)
-   Cream plaque: four-sided perforation + faint verde guilloche ground,
-   warm-black numbering-machine serial. A graded sepia engraved base-rule
-   replaces the old billete bar. The page's strongest contrast — the only one.
+   5. EL NÚMERO HÉROE  (#current_number — the mounted serial plaque)
+   A cream plaque under a glassine sleeve, kraft-cornered, with the serial
+   in heavy Fraunces. The page's strongest note.
    ===================================================================== */
 #current_number{
   display: inline-block;
-  --page: var(--crema-alta);                         /* the navbar field behind the plaque */
-  font-family: var(--font-numerador) !important;     /* máquina numeradora, like the serial */
-  font-weight: 800;
+  font-family: var(--font-numerador) !important;
+  font-weight: 900;
   font-feature-settings: var(--num-features);
   font-variant-numeric: tabular-nums lining-nums;
-  font-size: clamp(30px, 4.6vw, 50px) !important;    /* mono is wider — hold it on one line */
+  font-size: clamp(30px, 4.4vw, 48px) !important;
   line-height: 1;
-  letter-spacing: .07em;                             /* the numbering-machine gaps */
-  color: var(--tinta) !important;                    /* warm-black overprint (period-correct) */
-  -webkit-text-fill-color: var(--tinta);
-  background:
-    radial-gradient(var(--perf-r) at 50% 0,    #0000 95%, var(--page) 0) 0 0    / var(--perf-s) var(--perf-s) repeat-x,
-    radial-gradient(var(--perf-r) at 50% 100%, #0000 95%, var(--page) 0) 0 100% / var(--perf-s) var(--perf-s) repeat-x,
-    radial-gradient(var(--perf-r) at 0 50%,    #0000 95%, var(--page) 0) 0 0    / var(--perf-s) var(--perf-s) repeat-y,
-    radial-gradient(var(--perf-r) at 100% 50%, #0000 95%, var(--page) 0) 100% 0 / var(--perf-s) var(--perf-s) repeat-y,
-    var(--guilloche-decimo) center / 70px 22px repeat,
-    var(--crema);
+  letter-spacing: .04em;
+  color: var(--naranja-hondo) !important;
+  -webkit-text-fill-color: var(--naranja-hondo);
+  background: var(--pagina-alta);
   border: 2px solid var(--nogal);
-  border-bottom: 4px solid var(--tinta-sepia);       /* graded sepia engraved base-rule */
-  border-radius: 3px;
-  padding: .14em .5em .08em;
+  border-radius: 4px;
+  padding: .1em .5em .06em;
   margin: 0;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.55);   /* incised highlight only — no drop shadow */
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.6), 2px 3px 0 rgba(43,29,20,.16);
 }
 /* the "Nº" caption preceding the serial (cosmetic; not read by JS .text()) */
 #current_number::before{
   content: "N\00BA";
-  font-family: var(--font-caps); font-variant-caps: small-caps; font-weight: 600;
-  font-size: .44em; letter-spacing: .06em; color: var(--tinta-sepia);
+  font-family: var(--font-caps); font-weight: 700;
+  font-size: .40em; letter-spacing: .04em; color: var(--choco-suave);
   vertical-align: .55em; margin-right: .4em;
 }
 
 /* =====================================================================
-   6. BUTTONS — small-caps inscription faces; color-only state change
-   (square-ish, 2px engraved rule, ≥48px target, NO movement, NO shadow)
+   6. BUTTONS — typed labels on kraft / album stock; colour-only states
+   (square-ish, ≥46px target, a small printed press-shadow, no sweep)
    ===================================================================== */
 .btn{
   font-family: var(--font-caps);
-  font-variant-caps: small-caps;
-  font-weight: 600;
-  font-size: 19px;
-  letter-spacing: .06em;
-  min-height: 48px;
-  padding: .5rem 1.15rem;
-  border-radius: 4px;
-  border-width: 2px;
+  font-weight: 700;
+  font-size: 15px;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  min-height: 46px;
+  padding: .5rem 1.1rem;
+  border-radius: 5px;
+  border-width: 1.5px;
 }
 
-/* Primary save/submit (#submit, #submit_save get .btn-info added by JS).
-   The ONE filled button — solid bottle-green, quiet, not a ribbon.
+/* Primary save/submit (#submit / .btn-info). The ONE filled button —
+   burnt orange, the colour of an "en el álbum" tab.
    Scoped :not(.btn_number) so the grid's "Faltan datos" chip is untouched. */
 .btn-info:not(.btn_number){
-  background: var(--verde-botella) !important;
-  border-color: var(--verde-botella) !important;
+  background: var(--naranja) !important;
+  border-color: var(--naranja-hondo) !important;
   color: var(--marfil) !important;
-  box-shadow: inset 0 0 0 1px var(--verde-claro);
+  box-shadow: 2px 2px 0 rgba(43,29,20,.18);
 }
 .btn-info:not(.btn_number):hover,
 .btn-info:not(.btn_number):focus,
 .btn-info:not(.btn_number):active{
-  background: #163B28 !important;                 /* deepens, stays AAA on marfil */
-  border-color: #163B28 !important;
+  background: var(--naranja-hondo) !important;
+  border-color: var(--naranja-hondo) !important;
   color: var(--marfil) !important;
 }
 
-/* Sepia-ruled cream — section nav, "Mostrar todas…", "Buscar" (the document voice) */
+/* Kraft-ruled album stock — section nav, "Mostrar todas…", "Buscar" */
 .btn-outline-secondary,
 .btn-outline-info,
 .btn-outline-dark,
 .btn-outline-primary{
-  background: var(--crema);
+  background: var(--pagina);
   color: var(--tinta) !important;
-  border: 2px solid var(--tinta-sepia);
+  border: 1.5px solid var(--choco-suave);
 }
 .btn-outline-secondary:hover,.btn-outline-secondary:focus,.btn-outline-secondary:active,
 .btn-outline-info:hover,.btn-outline-info:focus,.btn-outline-info:active,
 .btn-outline-dark:hover,.btn-outline-dark:focus,.btn-outline-dark:active,
 .btn-outline-primary:hover,.btn-outline-primary:focus,.btn-outline-primary:active{
-  background: var(--papel-prensa) !important;
-  color: var(--tinta) !important;
-  border-color: var(--tinta-sepia) !important;
+  background: var(--kraft) !important;
+  color: var(--nogal) !important;
+  border-color: var(--choco-suave) !important;
 }
 
-/* "Iniciar captura" / "Echar foto" + navbar login "Identifícate" — green-ruled cream */
+/* "Escanear décimo" + navbar login "Identificarse" — olive-ruled album stock */
 .btn-outline-success,
 .btn-success:not(.btn_number){
-  background: var(--crema) !important;
-  color: var(--verde-botella) !important;
-  border: 2px solid var(--verde-claro) !important;
+  background: var(--pagina) !important;
+  color: var(--oliva) !important;
+  border: 1.5px solid var(--oliva) !important;
   box-shadow: inset 0 1px 0 rgba(255,255,255,.5);
 }
 .btn-outline-success:hover,.btn-outline-success:focus,.btn-outline-success:active,
 .btn-success:not(.btn_number):hover,
 .btn-success:not(.btn_number):focus{
-  background: var(--verde-botella) !important;
+  background: var(--oliva) !important;
   color: var(--marfil) !important;
-  border-color: var(--verde-botella) !important;
+  border-color: var(--oliva) !important;
 }
 
 /* Navbar logout "Salir de modo edición" (btn-danger) — walnut outline, no red */
 .btn-danger:not(.btn_number){
   background: transparent !important;
   color: var(--nogal) !important;
-  border: 2px solid var(--nogal) !important;
+  border: 1.5px solid var(--nogal) !important;
 }
 .btn-danger:not(.btn_number):hover,
 .btn-danger:not(.btn_number):focus{
@@ -320,87 +328,89 @@ h1::after{
 }
 
 /* =====================================================================
-   7. FORMS — cream fields, engraved walnut rules, verde focus halo
-   (font-size raised at higher specificity via `form …` to override the
-    per-page inline 14px blocks in retailers_collection.html.)
+   7. FORMS — the typed ficha: album fields, ribbon-red labels, orange focus
    ===================================================================== */
 .form-control{
-  font-family: var(--font-body);
+  font-family: var(--font-caps);
   color: var(--tinta);
-  background: var(--crema);
-  border: 1px solid var(--nogal);
-  border-radius: 4px;
-  min-height: 48px;
-  padding: .5rem .75rem;
+  background: var(--pagina-alta);
+  border: 1px solid var(--choco-suave);
+  border-radius: 3px;
+  min-height: 46px;
+  padding: .45rem .7rem;
 }
-.form-control::placeholder{ color: var(--tinta-sepia); opacity: 1; }   /* never faint */
+.form-control::placeholder{ color: var(--choco-suave); opacity: 1; }
 .form-control:focus{
   color: var(--tinta);
-  background: var(--crema);
-  border-color: var(--verde-claro);
-  box-shadow: 0 0 0 3px rgba(46,94,58,.25);
+  background: var(--pagina-alta);
+  border-color: var(--naranja);
+  box-shadow: 0 0 0 3px rgba(198,93,46,.22);
 }
 
-/* Labels always visible — small-caps inscription, never placeholder-as-label */
+/* Labels always visible — typed capitals in ribbon-red, never a placeholder */
 .col-form-label,
 label{
   font-family: var(--font-caps);
-  font-variant-caps: small-caps;
-  font-weight: 600;
-  color: var(--tinta);
-  letter-spacing: .05em;
+  font-weight: 700;
+  color: var(--rojo-maquina);
+  text-transform: uppercase;
+  letter-spacing: .03em;
 }
 
-/* ≥18px, raised above any inline 14px declaration via descendant specificity */
+/* ≥17px, raised above any inline block via descendant specificity */
 form .form-control,
-.form-horizontal .form-control{ font-size: 18px; }
+.form-horizontal .form-control{ font-size: 16px; }
 form label,
 form .col-form-label,
 .form-horizontal label,
-.form-horizontal .col-form-label{ font-size: 18px; }
+.form-horizontal .col-form-label{ font-size: 14px; }
 
-.radio label,.checkbox label{ font-size: 18px; font-weight: 500; }
+.radio label,.checkbox label{ font-size: 16px; font-weight: 700; text-transform: none; color: var(--tinta); }
 select.form-control{ appearance: auto; }
 
 /* Errors: text + colour, plain Castilian, beside the field */
 .help-block,.error,p.error,.invalid-feedback{
-  color: var(--tinta-sepia);
-  font-size: 17px;
-  font-family: var(--font-body);
+  color: var(--rojo-maquina);
+  font-size: 15px;
+  font-family: var(--font-caps);
 }
 
-/* Flash messages — cream leaf with a sepia left rule */
+/* Flash messages — an album leaf with a ribbon-red left rule */
 .alert-info{
-  background: var(--crema);
+  background: var(--pagina);
   border: 1px solid var(--papel-prensa);
-  border-left: 4px solid var(--tinta-sepia);
+  border-left: 4px solid var(--rojo-maquina);
   color: var(--tinta);
-  border-radius: 4px;
+  border-radius: 3px;
 }
 
 /* =====================================================================
    8. CARDS — comment leaves (.media) + chart cards (.card)
-   Each leaf = a cream sheet with a slim guilloche header band + a fine
-   sepia top hairline (replaces the old billete rule).
+   Each is an album leaf: cream sheet, thin chocolate rule, a kraft tab
+   pinned to the top-left corner.
    ===================================================================== */
-.media{
-  background: var(--crema);
-  border: 1px solid var(--papel-prensa);
-  border-top: 1px solid var(--tinta-sepia);
-  border-radius: 4px;
-  padding: 1rem 1.25rem;
+.media,
+.card{
+  background: var(--pagina);
+  border: 1px solid var(--choco-suave);
+  border-radius: 3px;
+  padding: 1rem 1.2rem;
   position: relative;
   overflow: hidden;
+  box-shadow: 2px 3px 0 rgba(43,29,20,.10);
 }
-.media::before{                         /* slim guilloche lathe band along the top */
-  content:""; position:absolute; left:0; right:0; top:0; height:10px;
-  background: var(--guilloche-banda) repeat-x center / 120px 10px;
-  opacity:.6; pointer-events:none;
+.media::before,
+.card::before{                       /* a kraft index-tab nub, top-left */
+  content:""; position:absolute; top:-1px; left:14px; width:34px; height:7px;
+  background: var(--kraft);
+  border: 1px solid var(--choco-suave); border-top: none;
+  border-radius: 0 0 4px 4px;
+  pointer-events:none;
 }
 .media .avatar,
 .media img.rounded-circle{
-  border: 2px solid var(--tinta-sepia);   /* Gravatar reframed as a sello on cream */
-  background: var(--crema);
+  border: 2px solid var(--kraft-hondo);   /* Gravatar reframed as a mounted stamp */
+  background: var(--pagina);
   padding: 2px;
 }
 .media-body{
@@ -411,205 +421,171 @@ select.form-control{ appearance: auto; }
 .media-body h5{
   font-family: var(--font-display);
   color: var(--nogal);
-  font-weight: 600;
-}
-
-/* Chart / statistics cards as quiet framed leaves */
-.card{
-  background: var(--crema);
-  border: 1px solid var(--papel-prensa);
-  border-top: 1px solid var(--tinta-sepia);
-  border-radius: 4px;
-  position: relative;
-  overflow: hidden;
-}
-.card::before{
-  content:""; position:absolute; left:0; right:0; top:0; height:10px;
-  background: var(--guilloche-banda) repeat-x center / 120px 10px;
-  opacity:.6; pointer-events:none;
+  font-weight: 700;
 }
 .card-body{ padding: 1.1rem 1.25rem; }
 
-/* Non-navbar .bg-light panels (index hero, "Últimos comentarios" head) = cream */
+/* Non-navbar .bg-light panels (index hero, ficha panels) = album leaf */
 .bg-light:not(.navbar){
-  background: var(--crema) !important;
-  border: 1px solid var(--papel-prensa);
-  border-radius: 4px;
+  background: var(--pagina) !important;
+  border: 1px solid var(--choco-suave);
+  border-radius: 3px;
+  box-shadow: 2px 3px 0 rgba(43,29,20,.10);
 }
 
 /* Section dividers used by the resize JS — render as warm hairlines */
-.border-right{ border-right: 1px solid var(--nogal-claro) !important; }
-.border-left{ border-left: 1px solid var(--nogal-claro) !important; }
+.border-right{ border-right: 1px solid var(--kraft-hondo) !important; }
+.border-left{ border-left: 1px solid var(--kraft-hondo) !important; }
 
 /* =====================================================================
-   9. NUMBERS GRID — perforated décimo tiles (.btn_number)
-   The numbering-machine chip: torn fracción edge + faint guilloche ground
-   over a reserved cream panel. Status states recolour ONLY background/color
-   so the perforation + guilloche layers survive; meaning is reinforced by an
-   engraved corner ornament + the template label, never by hue alone.
+   9. NUMBERS GRID — mounted décimo chips (.btn_number)
+   Each chip is a small ticket mounted on the leaf. Status recolours the
+   ground/ink; meaning is reinforced by a corner mark + the template label,
+   never by hue alone.
    ===================================================================== */
 .btn_number{
-  --page: var(--crema);          /* the album leaf behind the tile, for the perforation */
   font-family: var(--font-chip);
-  font-weight: 600;
+  font-weight: 700;
   font-feature-settings: var(--num-features);
   font-variant-numeric: tabular-nums lining-nums;
-  min-width: 48px;
-  min-height: 48px;
+  min-width: 46px;
+  min-height: 46px;
   border-radius: 4px;
   color: var(--tinta);
-  background:
-    radial-gradient(var(--perf-r) at 50% 0,    #0000 94%, var(--page) 0) 0 0    / var(--perf-s) var(--perf-s) repeat-x,
-    radial-gradient(var(--perf-r) at 50% 100%, #0000 94%, var(--page) 0) 0 100% / var(--perf-s) var(--perf-s) repeat-x,
-    radial-gradient(var(--perf-r) at 0 50%,    #0000 94%, var(--page) 0) 0 0    / var(--perf-s) var(--perf-s) repeat-y,
-    radial-gradient(var(--perf-r) at 100% 50%, #0000 94%, var(--page) 0) 100% 0 / var(--perf-s) var(--perf-s) repeat-y,
-    var(--guilloche-decimo) center / 60px 20px repeat,
-    var(--crema-alta);          /* reserved (lighter) panel */
-  border: 1px solid var(--papel-prensa);   /* outer hairline, not a ruled box */
-  box-shadow: inset 0 0 0 1px var(--papel-prensa);
-  position: relative;            /* anchor the status corner ornaments */
+  background: var(--pagina-alta);
+  border: 1px solid var(--choco-suave);
+  box-shadow: 1px 1px 0 rgba(43,29,20,.12);
+  position: relative;
   overflow: visible;
 }
-.btn_number:hover{ background-color: var(--papel-prensa); }
-.btn_number.btn-lg{ font-size: 22px; min-height: 52px; }
-.btn_number.btn-md{ font-size: 20px; min-height: 48px; }
-.btn_number.btn-sm{ font-size: 18px; min-height: 44px; min-width: 44px; }
+.btn_number:hover{ background-color: var(--kraft); color: var(--nogal); }
+.btn_number.btn-lg{ font-size: 20px; min-height: 50px; }
+.btn_number.btn-md{ font-size: 18px; min-height: 46px; }
+.btn_number.btn-sm{ font-size: 16px; min-height: 42px; min-width: 42px; }
 
 .group_label{
   font-family: var(--font-caps);
-  font-variant-caps: small-caps;
-  font-size: 18px;
-  color: var(--nogal);
-  letter-spacing: .06em;
-  font-weight: 600;
+  font-weight: 700;
+  font-size: 14px;
+  text-transform: uppercase;
+  color: var(--rojo-maquina);
+  letter-spacing: .05em;
 }
 
-/* keep chips ≥8px apart on either group axis */
+/* keep chips apart on either group axis */
 .btn-group > .btn_number,
 .btn-group-vertical > .btn_number{ margin: 0 8px 8px 0; }
 
-/* --- Status states: value + engraved ornament + (template) label ----- */
+/* --- Status states: ground + corner mark + (template) label ----- */
 
-/* Perfecto / en la colección — the complete, inked ticket.
-   Bottle-green fill, ivory numeral, walnut border; a fine ivory voluta
-   corner-mark engraved into the top-left. */
+/* Perfecto / en el álbum — the mounted, complete ticket: burnt-orange stock,
+   ivory numeral, a kraft photo-corner mount top-left. */
 .btn_number.btn-success{
-  background-color: var(--verde-botella) !important;
+  background-color: var(--naranja) !important;
   color: var(--marfil) !important;
-  border-color: var(--nogal) !important;
+  border-color: var(--naranja-hondo) !important;
 }
 .btn_number.btn-success::before{
-  content:""; position:absolute; top:3px; left:3px; width:15px; height:15px;
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%23F8F2E2' stroke-width='1.3' stroke-linecap='round' d='M3 21 C3 12 9 5 18 4 C11 7 9 12 11 16 C12 18 15 18 16 15'/%3E%3C/svg%3E") no-repeat center / contain;
-  opacity:.9; pointer-events:none;
+  content:""; position:absolute; top:0; left:0; width:12px; height:12px;
+  background: var(--corner-tl) no-repeat top left / contain;
+  pointer-events:none;
 }
 .btn_number.btn-success::after{ content:none; }
 
-/* Defectuoso — the foxed/flawed sheet.
-   Warm-brown paper fill, dark numeral, walnut border; a cut top-right corner
-   (the album page shows through) + a fine walnut defect rule. */
+/* Defectuoso — the flawed sheet: mustard stock, dark ink, a clipped
+   top-right corner (the leaf shows through) marking the defect. */
 .btn_number.btn-warning{
-  background-color: var(--papel-prensa) !important;
-  color: var(--tinta) !important;
-  border-color: var(--nogal) !important;
+  background-color: var(--mostaza) !important;
+  color: var(--nogal) !important;
+  border-color: var(--choco-suave) !important;
 }
-.btn_number.btn-warning::before{ content:none; }   /* (old floating rule removed) */
-.btn_number.btn-warning::after{           /* clipped top-right corner: page shows through,
-                                             with the cut line ON the diagonal (the defect) */
-  content:""; position:absolute; top:0; right:0; width:15px; height:15px;
-  border-top-right-radius:4px;            /* follow the chip's rounded corner */
+.btn_number.btn-warning::before{ content:none; }
+.btn_number.btn-warning::after{
+  content:""; position:absolute; top:0; right:0; width:13px; height:13px;
+  border-top-right-radius:4px;
   background: linear-gradient(45deg,
-    transparent 0 45%, var(--nogal) 45% 55%, var(--page) 55% 100%);
+    transparent 0 45%, var(--nogal) 45% 55%, var(--pagina) 55% 100%);
   pointer-events:none;
 }
 
-/* Falta — the empty album slot. Bare cream, dashed engraved hairline. */
+/* Falta — the empty album slot: bare leaf, dashed kraft hairline. */
 .btn_number.btn-secondary{
-  background-color: var(--crema) !important;
-  color: var(--tinta-sepia) !important;
-  border: 1px dashed var(--nogal-claro) !important;
+  background-color: var(--pagina) !important;
+  color: var(--choco-suave) !important;
+  border: 1px dashed var(--kraft-hondo) !important;
+  box-shadow: inset 0 1px 6px rgba(43,29,20,.08);
 }
+.btn_number.btn-secondary:hover{ background-color: var(--pagina) !important; color: var(--choco) !important; }
 .btn_number.btn-secondary::before,
 .btn_number.btn-secondary::after{ content:none; }
 
-/* Faltan Datos — recorded but incomplete. Brown panel, dotted rule, "?" glyph. */
+/* Faltan Datos — recorded but incomplete: tan stock, dotted rule, "?" glyph. */
 .btn_number.btn-info{
   background-color: var(--papel-prensa) !important;
-  color: var(--tinta-sepia) !important;
-  border: 2px dotted var(--nogal-claro) !important;
+  color: var(--choco-suave) !important;
+  border: 2px dotted var(--kraft-hondo) !important;
 }
 .btn_number.btn-info::after{
   content:"?";
   position:absolute; top:1px; right:4px;
-  font-family: var(--font-chip); font-size:12px; font-weight:600;
+  font-family: var(--font-chip); font-size:12px; font-weight:700;
   color: var(--nogal); line-height:1;
   pointer-events:none;
 }
 
 /* =====================================================================
-   10. FILTERS (numbers_filters.html) — ledger lines + verde engraved thumb
+   10. FILTERS (FiltrosView) — ledger lines + burnt-orange slider thumb
    ===================================================================== */
 #filter_container .form-inline,
 #filter_container > div{
-  border-bottom: 1px solid rgba(90,62,43,.30);
+  border-bottom: 1px solid rgba(107,81,56,.28);
   padding: .35rem 0;
 }
 .slider_filter{
   -webkit-appearance: none; appearance: none;
   height: 6px; border-radius: 3px;
-  background: linear-gradient(var(--nogal-claro),var(--nogal));
+  background: linear-gradient(var(--kraft-hondo),var(--choco-suave));
   outline-offset: 4px;
   margin: 0 .6rem;
 }
 .slider_filter::-webkit-slider-thumb{
   -webkit-appearance: none; appearance: none;
   width: 22px; height: 22px; border-radius: 50%;
-  background: var(--verde-claro);
+  background: var(--naranja);
   border: 1px solid var(--nogal);
   cursor: pointer;
 }
 .slider_filter::-moz-range-thumb{
   width: 22px; height: 22px; border-radius: 50%;
-  background: var(--verde-claro);
+  background: var(--naranja);
   border: 1px solid var(--nogal);
   cursor: pointer;
 }
-/* a slider at 0 disables its text input — dim it + show it is "off" */
 .form-control:disabled,
 .form-control[disabled]{
   background: var(--papel-prensa);
   opacity: .55;
   cursor: not-allowed;
 }
-#filtered_list{ scrollbar-color: var(--nogal-claro) var(--papel-prensa); }
+#filtered_list{ scrollbar-color: var(--kraft-hondo) var(--papel-prensa); }
 
 /* =====================================================================
-   11. LEAFLET MAP — the second engraved orla
-   Cream mat with a faint verde guilloche ground, framed by the triple sepia
-   rule + mirrored voluta corners. Monochrome clusters (no royal blue).
+   11. LEAFLET MAP — a mounted map plate with kraft photo-corners
+   Cream mat, thin chocolate frame, four kraft corners. Warm monochrome
+   clusters (owned = orange, others = olive/kraft — never royal blue).
    ===================================================================== */
 #map_container{
   padding: 12px;
-  background-color: var(--crema);
+  background-color: var(--pagina);
   background-image:
-    var(--voluta-corner), var(--voluta-corner), var(--voluta-corner), var(--voluta-corner),
-    var(--guilloche-mat);
-  background-repeat: no-repeat, no-repeat, no-repeat, no-repeat, repeat;
-  background-position: top left, top right, bottom left, bottom right, center;
-  background-size: 40px 40px, 40px 40px, 40px 40px, 40px 40px, 120px 24px;
-  box-shadow: inset 0 0 0 1.5px var(--nogal);   /* outer umber filete */
+    var(--corner-tl), var(--corner-tr), var(--corner-bl), var(--corner-br);
+  background-repeat: no-repeat, no-repeat, no-repeat, no-repeat;
+  background-position: top left, top right, bottom left, bottom right;
+  background-size: 26px 26px;
+  box-shadow: 2px 3px 0 rgba(43,29,20,.14), inset 0 0 0 1px var(--choco-suave);
   border-radius: 3px;
   position: relative;
 }
-#map_container::before{            /* walnut hairline (the second rule) */
-  content:""; position:absolute; inset:7px; pointer-events:none;
-  border:1px solid var(--tinta-sepia);
-}
-#map_container::after{             /* faint verde rule (the third) */
-  content:""; position:absolute; inset:11px; pointer-events:none;
-  box-shadow: inset 0 0 0 1px rgba(46,94,58,.45);
-}
-.marker-cluster-top-right{ transform: scaleX(-1); }   /* (no-op safety) */
 #map{
   border: 1px solid var(--nogal);
   border-radius: 2px;
@@ -617,78 +593,70 @@ select.form-control{ appearance: auto; }
   z-index: 1;
 }
 
-/* Leaflet popups re-skinned as a small cream ficha */
+/* Leaflet popups re-skinned as a small ficha */
 .leaflet-popup-content-wrapper{
-  background: var(--crema);
+  background: var(--pagina-alta);
   color: var(--tinta);
-  border: 1px solid var(--tinta-sepia);
-  border-radius: 4px;
+  border: 1px solid var(--choco-suave);
+  border-radius: 3px;
   box-shadow: 0 4px 14px rgba(0,0,0,.22);
 }
 .leaflet-popup-content{
-  font-family: var(--font-body);
-  font-size: 18px;
+  font-family: var(--font-caps);
+  font-size: 15px;
   line-height: 1.45;
   color: var(--tinta);
 }
-.leaflet-popup-tip{ background: var(--crema); border: 1px solid var(--tinta-sepia); }
+.leaflet-popup-tip{ background: var(--pagina-alta); border: 1px solid var(--choco-suave); }
 .leaflet-bar a,
 .leaflet-control-zoom a{
   color: var(--nogal);
-  background: var(--crema);
+  background: var(--pagina);
   border-bottom-color: var(--papel-prensa);
 }
-.leaflet-bar a:hover{ background: var(--papel-prensa); color: var(--verde-botella); }
+.leaflet-bar a:hover{ background: var(--kraft); color: var(--naranja-hondo); }
 
-/* --- Marker-cluster palette (contract): quiet monochrome ----------------
-   Two-class selectors outrank the per-page inline single-class !important
-   rules. Owned = bottle-green on a faint verde halo; not-owned = umber/sepia
-   discs (NOT royal blue) — distinguished by value + icon, ivory counts. */
-.marker-cluster.marker-cluster-owned-small  { background: rgba(46,94,58,.30) !important; }
-.marker-cluster.marker-cluster-owned-small  div{ background: rgba(30,77,52,.88) !important; color: var(--marfil) !important; }
-.marker-cluster.marker-cluster-owned-medium { background: rgba(46,94,58,.40) !important; }
-.marker-cluster.marker-cluster-owned-medium div{ background: rgba(30,77,52,.92) !important; color: var(--marfil) !important; }
-.marker-cluster.marker-cluster-owned-large  { background: rgba(46,94,58,.50) !important; }
-.marker-cluster.marker-cluster-owned-large  div{ background: rgba(30,77,52,.96) !important; color: var(--marfil) !important; }
+/* --- Marker-cluster palette (contract): warm monochrome --------------- */
+.marker-cluster.marker-cluster-owned-small  { background: rgba(198,93,46,.30) !important; }
+.marker-cluster.marker-cluster-owned-small  div{ background: rgba(168,70,28,.88) !important; color: var(--marfil) !important; }
+.marker-cluster.marker-cluster-owned-medium { background: rgba(198,93,46,.40) !important; }
+.marker-cluster.marker-cluster-owned-medium div{ background: rgba(168,70,28,.92) !important; color: var(--marfil) !important; }
+.marker-cluster.marker-cluster-owned-large  { background: rgba(198,93,46,.50) !important; }
+.marker-cluster.marker-cluster-owned-large  div{ background: rgba(168,70,28,.96) !important; color: var(--marfil) !important; }
 
-.marker-cluster.marker-cluster-small  { background: rgba(87,66,49,.28) !important; }
-.marker-cluster.marker-cluster-small  div{ background: rgba(87,66,49,.85) !important; color: var(--marfil) !important; }
-.marker-cluster.marker-cluster-medium { background: rgba(87,66,49,.38) !important; }
-.marker-cluster.marker-cluster-medium div{ background: rgba(58,42,26,.90) !important; color: var(--marfil) !important; }
-.marker-cluster.marker-cluster-large  { background: rgba(87,66,49,.48) !important; }
-.marker-cluster.marker-cluster-large  div{ background: rgba(58,42,26,.95) !important; color: var(--marfil) !important; }
+.marker-cluster.marker-cluster-small  { background: rgba(110,118,69,.28) !important; }
+.marker-cluster.marker-cluster-small  div{ background: rgba(110,118,69,.85) !important; color: var(--marfil) !important; }
+.marker-cluster.marker-cluster-medium { background: rgba(110,118,69,.38) !important; }
+.marker-cluster.marker-cluster-medium div{ background: rgba(90,98,55,.90) !important; color: var(--marfil) !important; }
+.marker-cluster.marker-cluster-large  { background: rgba(110,118,69,.48) !important; }
+.marker-cluster.marker-cluster-large  div{ background: rgba(90,98,55,.95) !important; color: var(--marfil) !important; }
 
 .marker-cluster div{
   font-family: var(--font-chip);
-  font-weight: 600;
+  font-weight: 700;
   font-feature-settings: "tnum";
 }
 
 /* =====================================================================
-   12. PHOTO / SCREENSHOT PANEL (retailers_collection.html)
-   Matches the map: cream tray + sepia triple-rule orla + voluta corners.
+   12. PHOTO / SCAN PANEL (RetailersView) — a mounted estampa
+   Matches the map plate: cream mat + kraft photo-corners.
    ===================================================================== */
 #screenshot{
   padding: 14px;
-  background-color: var(--crema);
+  background-color: var(--pagina);
   background-image:
-    var(--voluta-corner), var(--voluta-corner), var(--voluta-corner), var(--voluta-corner),
-    var(--guilloche-mat);
-  background-repeat: no-repeat, no-repeat, no-repeat, no-repeat, repeat;
-  background-position: top left, top right, bottom left, bottom right, center;
-  background-size: 40px 40px, 40px 40px, 40px 40px, 40px 40px, 120px 24px;
-  box-shadow: inset 0 0 0 1.5px var(--nogal);
+    var(--corner-tl), var(--corner-tr), var(--corner-bl), var(--corner-br);
+  background-repeat: no-repeat, no-repeat, no-repeat, no-repeat;
+  background-position: top left, top right, bottom left, bottom right;
+  background-size: 26px 26px;
+  box-shadow: 2px 3px 0 rgba(43,29,20,.14), inset 0 0 0 1px var(--choco-suave);
   border-radius: 3px;
   position: relative;
-}
-#screenshot::before{
-  content:""; position:absolute; inset:9px; pointer-events:none;
-  border:1px solid var(--tinta-sepia);
 }
 #image,
 .screenshot{
   border: 1px solid var(--nogal);
-  background: var(--crema);
+  background: var(--pagina);
   border-radius: 2px;
   position: relative;
   z-index: 1;
@@ -696,82 +664,104 @@ select.form-control{ appearance: auto; }
 .loading{ display: block; }
 
 /* =====================================================================
-   13. ENGRAVING ORNAMENT KIT (static CSS/SVG — no JS/contract role)
-   Volutas, filigree dividers, guilloche bands, rosette, cartouche/orla
-   frames. Every technique is static: hover may change colour, never move.
+   13. ALBUM ORNAMENT KIT (static CSS/SVG — kept as contract, re-skinned)
+   The old engraving classes (.orla/.voluta/.roseta/.divider/.guilloche/…)
+   still appear in the templates; here they are re-skinned to the album:
+   kraft-cornered leaves, typed dividers, soft kraft flourishes. Static only.
    ===================================================================== */
 
-/* 13.1 Voluta corner ornaments — inline S-scroll mirrored to four corners */
+/* 13.1 Voluta corner scrolls — retired in favour of kraft photo-corners.
+   Kept as no-op rules so the template's <svg class="voluta"> elements simply
+   vanish rather than clashing with the album's mounted-corner language. */
 .cartouche{ position: relative; }
-.voluta{ position:absolute; width:56px; height:56px; color:var(--tinta-sepia); opacity:.6; pointer-events:none; }
+.voluta{ display:none; position:absolute; width:40px; height:40px; color:var(--kraft-hondo); opacity:.42; pointer-events:none; }
 .voluta--tl{ top:6px; left:6px; }
 .voluta--tr{ top:6px;  right:6px;  transform:scaleX(-1); }
 .voluta--bl{ bottom:6px; left:6px; transform:scaleY(-1); }
 .voluta--br{ bottom:6px; right:6px; transform:scale(-1,-1); }
-/* a single top-center cresting (masthead): one voluta pair, no body scrollwork */
 .cartouche--crest .voluta--tl{ left:50%; transform:translateX(-100%); }
 .cartouche--crest .voluta--tr{ left:50%; transform:translateX(0) scaleX(-1); }
+/* a framed leaf already has kraft photo-corners — drop the redundant corner scrolls */
+.orla .voluta{ display:none; }
 
-/* 13.2 Filigree / acanthus divider — the cul-de-lampe section break */
-.divider{ display:block; margin:1.75rem auto; color:var(--nogal-claro); opacity:.7; }
-.divider--verde{ color:var(--verde-claro); }
+/* 13.2 Divider — a typed cul-de-lampe (dashes + a ribbon-red centre pip) */
+.divider{ display:block; margin:1.5rem auto; color:var(--kraft-hondo); opacity:.85; }
+.divider--verde{ color:var(--naranja); }
 
-/* 13.3 Guilloche band — the slim lathe rule (sepia default, verde ceremonial) */
+/* 13.3 Guilloche band — repurposed as a faint kraft stitch line */
 .guilloche{ position:relative; }
 .guilloche > *{ position:relative; z-index:1; }
 .guilloche::before{
-  content:""; position:absolute; inset:0; z-index:0; pointer-events:none; opacity:.16;
-  background-repeat:repeat;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='24'%3E%3Cg fill='none' stroke='%23574231' stroke-width='0.8'%3E%3Cpath d='M0 12 C20 2 40 22 60 12 S100 2 120 12'/%3E%3Cpath d='M0 12 C20 22 40 2 60 12 S100 22 120 12'/%3E%3C/g%3E%3C/svg%3E");
+  content:""; position:absolute; inset:0; z-index:0; pointer-events:none; opacity:.5;
+  background:repeating-linear-gradient(90deg,
+    var(--kraft-hondo) 0 6px, transparent 6px 12px) center bottom / 100% 1.5px no-repeat;
 }
 .guilloche--verde::before{
-  opacity:.14;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='24'%3E%3Cg fill='none' stroke='%232E5E3A' stroke-width='0.8'%3E%3Cpath d='M0 12 C20 2 40 22 60 12 S100 2 120 12'/%3E%3Cpath d='M0 12 C20 22 40 2 60 12 S100 22 120 12'/%3E%3C/g%3E%3C/svg%3E");
+  background:repeating-linear-gradient(90deg,
+    var(--naranja) 0 6px, transparent 6px 12px) center bottom / 100% 1.5px no-repeat;
 }
 
-/* 13.4 Guilloche rosette — the ceremonial seal (neutral floret, never an emblem) */
-.roseta{ width:64px; height:64px; color:var(--verde-claro); opacity:.5; pointer-events:none; }
+/* 13.4 Roseta — softened to a faint kraft floret */
+.roseta{ width:56px; height:56px; color:var(--kraft-hondo); opacity:.4; pointer-events:none; }
 
-/* 13.5 Triple-rule cartouche frame — the engraver's graded thick–thin–thin orla */
-.orla{ position:relative; padding:1.4rem 1.6rem; background:var(--crema);
-  box-shadow: inset 0 0 0 1.5px var(--nogal); }            /* outer umber filete */
-.orla::before{ content:""; position:absolute; inset:7px; pointer-events:none;
-  border:1px solid var(--tinta-sepia); }                   /* walnut hairline */
-.orla::after{ content:""; position:absolute; inset:11px; pointer-events:none;
-  box-shadow: inset 0 0 0 1px rgba(46,94,58,.45); }        /* faint verde rule */
-.orla--verde{ box-shadow: inset 0 0 0 1.5px var(--verde-botella); }
+/* 13.5 Orla — the framed album leaf (cream sheet, chocolate rule, kraft corners) */
+.orla{
+  position:relative; padding:1.3rem 1.5rem;
+  background:var(--pagina);
+  background-image:
+    var(--corner-tl), var(--corner-tr), var(--corner-bl), var(--corner-br);
+  background-repeat:no-repeat;
+  background-position: top left, top right, bottom left, bottom right;
+  background-size:26px 26px;
+  border-radius:3px;
+  box-shadow: 2px 3px 0 rgba(43,29,20,.12), inset 0 0 0 1px var(--choco-suave);
+}
+.orla::before{      /* the glassine sleeve sheen across the leaf */
+  content:""; position:absolute; inset:8px; pointer-events:none; border-radius:2px;
+  background:linear-gradient(118deg,
+    rgba(255,255,255,.28) 0 10%, transparent 12% 58%,
+    rgba(255,255,255,.16) 60% 66%, transparent 68%);
+}
+.orla--verde{ box-shadow: 2px 3px 0 rgba(43,29,20,.12), inset 0 0 0 1.5px var(--naranja-hondo); }
 
-/* 13.6 Corner-flourish orla via border-image (slice-9) — the signature frame */
+/* 13.6 Corner-flourish orla via border-image — a kraft-tab bracket frame */
 .frame-orla{
-  border:24px solid transparent;
+  border:20px solid transparent;
   border-image:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='72'%3E%3Cg fill='none' stroke='%23574231' stroke-width='0.9' stroke-linecap='round'%3E%3Cpath d='M4 24 V8 a4 4 0 0 1 4-4 H24'/%3E%3Cpath d='M10 22 C10 14 14 10 22 10'/%3E%3Cpath d='M68 24 V8 a4 4 0 0 0-4-4 H48'/%3E%3Cpath d='M62 22 C62 14 58 10 50 10'/%3E%3Cpath d='M4 48 V64 a4 4 0 0 0 4 4 H24'/%3E%3Cpath d='M10 50 C10 58 14 62 22 62'/%3E%3Cpath d='M68 48 V64 a4 4 0 0 1-4 4 H48'/%3E%3Cpath d='M62 50 C62 58 58 62 50 62'/%3E%3Cpath d='M28 4 H44 M28 68 H44 M4 28 V44 M68 28 V44' stroke-width='0.7'/%3E%3C/g%3E%3C/svg%3E")
-    24 / 24px / 0 stretch;
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Cg fill='none' stroke='%23B4934F' stroke-width='2'%3E%3Cpath d='M4 20 V6 a2 2 0 0 1 2-2 H20'/%3E%3Cpath d='M56 20 V6 a2 2 0 0 0-2-2 H40'/%3E%3Cpath d='M4 40 V54 a2 2 0 0 0 2 2 H20'/%3E%3Cpath d='M56 40 V54 a2 2 0 0 1-2 2 H40'/%3E%3C/g%3E%3C/svg%3E")
+    20 / 20px / 0 stretch;
 }
 
-/* 13.7 Engraved small-caps heading / nameplate — incised into the cream */
+/* 13.7 Typed small-caps heading / nameplate — a ribbon-red typed caption */
 .engrave-caps,
 .nameplate{
   font-family: var(--font-caps);
-  font-variant-caps: small-caps; font-feature-settings:"smcp" 1,"onum" 0;
-  letter-spacing:.08em; word-spacing:.04em;
-  color: var(--tinta-sepia);
-  text-shadow: 0 1px 0 rgba(255,255,255,.55);          /* incised into cream */
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing:.06em;
+  color: var(--rojo-maquina);
 }
-.on-green .engrave-caps{ color: var(--marfil); text-shadow: 0 -1px 0 rgba(0,0,0,.45); }
-.nameplate{ display:inline-block; font-size:18px; padding:.2em .2em; }
+.on-green .engrave-caps{ color: var(--marfil); }
+.nameplate{
+  display:inline-block; font-size:15px; padding:.25em .6em;
+  background:var(--kraft);
+  color:var(--nogal);
+  border:1px solid var(--choco-suave);
+  border-radius:4px;
+  box-shadow:1px 1px 0 rgba(43,29,20,.15);
+}
 
-/* 13.8 Small static helpers reused by templates (re-skinned, no marketing) */
-.hairline{ border:0; border-top:1px solid var(--tinta-sepia); opacity:.6; }
-.sello{                                  /* Gravatar-style stamp: sepia ring on cream */
+/* 13.8 Small static helpers reused by templates */
+.hairline{ border:0; border-top:1px dashed var(--kraft-hondo); opacity:.7; }
+.sello{                                  /* Gravatar-style stamp: kraft ring on cream */
   width:64px; height:64px; border-radius:50%;
-  background: var(--crema);
-  box-shadow: inset 0 0 0 2px var(--tinta-sepia);
-  color: var(--tinta-sepia); display:grid; place-items:center;
+  background: var(--pagina);
+  box-shadow: inset 0 0 0 2px var(--kraft-hondo);
+  color: var(--choco-suave); display:grid; place-items:center;
 }
 .photo-corner{
   position:absolute; width:18px; height:18px;
-  border-top:2px solid var(--tinta-sepia); border-left:2px solid var(--tinta-sepia);
+  border-top:2px solid var(--kraft-hondo); border-left:2px solid var(--kraft-hondo);
 }
 .photo-corner--tr{ transform: rotate(90deg); }
 .photo-corner--br{ transform: rotate(180deg); }
@@ -779,13 +769,12 @@ select.form-control{ appearance: auto; }
 
 /* =====================================================================
    14. ACCESSIBILITY & MOTION (overrides aesthetics on conflict)
-   No motion anywhere: no @keyframes, no movement transitions. State change
-   is a colour shift on hover/focus only — nothing rotates, pulses or sweeps.
+   No motion anywhere. State change is a colour shift on hover/focus only.
    ===================================================================== */
 :focus-visible{
-  outline: 3px solid var(--verde-claro);
+  outline: 3px solid var(--naranja);
   outline-offset: 2px;
-  box-shadow: 0 0 0 1px var(--crema-alta);     /* cream halo carries focus on green tiles */
+  box-shadow: 0 0 0 1px var(--pagina-alta);
 }
 a:focus-visible,
 button:focus-visible,
@@ -795,13 +784,13 @@ select:focus-visible,
 textarea:focus-visible,
 .btn_number:focus-visible,
 .slider_filter:focus-visible{
-  outline: 3px solid var(--verde-claro);
+  outline: 3px solid var(--naranja);
   outline-offset: 2px;
-  box-shadow: 0 0 0 1px var(--crema-alta);
+  box-shadow: 0 0 0 1px var(--pagina-alta);
 }
 
-a{ color: var(--verde-botella); text-decoration: underline; text-underline-offset: 2px; }
-a:hover{ color: var(--verde-claro); }
+a{ color: var(--naranja-hondo); text-decoration: underline; text-underline-offset: 2px; }
+a:hover{ color: var(--naranja); }
 
 @media (prefers-reduced-motion: reduce){
   *,*::before,*::after{

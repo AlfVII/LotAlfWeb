@@ -44,9 +44,9 @@ onMounted(async () => {
         </div>
         <div class="row stats-row">
           <div class="col-md-6"><div class="card"><div class="card-body"><div class="chart-cap">Por comunidad</div>
-            <div class="chart-box"><StatChart type="bar" horizontal color="#574231" :data="d.retailers_regions" /></div></div></div></div>
+            <div class="chart-box"><StatChart type="bar" horizontal color="#6E7645" :data="d.retailers_regions" /></div></div></div></div>
           <div class="col-md-6"><div class="card"><div class="card-body"><div class="chart-cap">Por provincia</div>
-            <div class="chart-box"><StatChart type="bar" color="#574231" :data="d.retailers_provinces" /></div></div></div></div>
+            <div class="chart-box"><StatChart type="bar" color="#6E7645" :data="d.retailers_provinces" /></div></div></div></div>
         </div>
       </template>
     </div>
