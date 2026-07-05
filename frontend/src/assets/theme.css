@@ -606,6 +606,11 @@ select.form-control{ appearance: auto; }
   position: relative;
   z-index: 1;
 }
+/* Age the base OSM tiles to a warm album-map tone. Only the tile pane is
+   filtered — the markers (overlay pane) and popups stay full-colour. */
+.leaflet-tile-pane{
+  filter: sepia(0.5) saturate(0.72) brightness(1.04) contrast(0.9) hue-rotate(-6deg);
+}
 
 /* Leaflet popups re-skinned as a small ficha */
 .leaflet-popup-content-wrapper{
