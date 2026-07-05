@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Los Décimos de Ildefonso — Colección de números</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="theme.css">
+  <style>
+    /* ---- fit one screen, no vertical scroll ---- */
+    html,body{ height:100%; }
+    body{ display:flex; flex-direction:column; overflow:hidden; }
+    .navbar{ flex:0 0 auto; }
+    .navbar.bg-light{ padding-top:.3rem; padding-bottom:.3rem; }
+    .navbar.bg-light.mt-2{ margin-top:.4rem!important; }
+    .fit-main{ flex:1 1 auto; min-height:0; display:flex; flex-direction:column; padding:.45rem .6rem; }
+    .fit-main > .row{ flex:1 1 auto; min-height:0; margin:0; }
+    .fit-main > .row > [class^="col-"]{ height:100%; display:flex; flex-direction:column; min-height:0; }
+
+    .ficha-panel{ flex:1 1 auto; min-height:0; overflow:auto; }
+    .ficha-panel .form-row{ margin-top:.28rem!important; }
+    .ficha-panel .form-control{ min-height:36px; }
+    .ficha-panel .col-form-label{ padding-top:.25rem; padding-bottom:.25rem; }
+
+    .orla.orla--verde{ flex:1 1 auto; min-height:0; display:flex; flex-direction:column; padding:.7rem 1rem!important; }
+    .album-head{ flex:0 0 auto; }
+    .album-head .roseta{ width:38px!important; height:38px!important; }
+    .album-head h3{ font-size:21px; }
+    .centena-grid{ flex:1 1 auto; min-height:0; display:grid;
+      grid-template-columns:repeat(10,1fr); grid-auto-rows:1fr; gap:5px; }
+    .centena-grid .btn_number{ min-width:0!important; min-height:0!important; height:100%;
+      padding:0; font-size:clamp(13px,1.35vw,18px)!important; }
+    .album-legend{ flex:0 0 auto; }
+    .legend-chip{ width:40px; height:34px; display:inline-grid; place-items:center; }
+
+    /* ---- quiet walnut colophon band, compact ---- */
+    .counter-footer{
+      flex:0 0 auto;
+      background: linear-gradient(180deg, var(--nogal-claro), var(--nogal));
+      color: var(--marfil);
+      border-top: 1px solid var(--nogal-claro);
+      font-family: var(--font-caps);
+      padding:.35rem 0!important; margin-top:0!important;
+    }
+    .counter-footer .engrave-caps{ font-size: 17px!important; }
+    .counter-footer .legal{ font-size: 13px!important; color: var(--marfil); opacity: .85; }
+  </style>
+</head>
+<body>
+  <!-- ===== El cabezal — a quiet engraved nameplate ===== -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="#">Los décimos de Ildefonso</a>
+    <span class="engrave-caps d-none d-lg-inline-block ml-3" style="font-size:18px;">Desde 1955</span>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav">
+        <li class="nav-item"><a class="nav-link" href="#">Tablón</a></li>
+        <li class="nav-item"><a class="nav-link active" href="#">Colección de números</a></li>
+        <li class="nav-item"><a class="nav-link" href="#">Colección de administraciones</a></li>
+      </ul>
+    </div>
+    <div>
+      <ul class="navbar-nav flex-row align-items-center">
+        <li class="nav-item mr-2"><input type="password" class="form-control" id="edit_mode_password" placeholder="Identifíquese para editar"></li>
+        <li class="nav-item"><button class="btn btn-success">Identificarse</button></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- ===== Sub-cabezal: secciones + el número actual + búsqueda ===== -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-light mx-2 mt-2">
+    <ul class="navbar-nav">
+      <li class="nav-item">
+        <a class="btn btn-outline-secondary mr-2" href="#">
+          <svg viewBox="0 0 24 24" width="20" height="20" class="align-middle mr-1" fill="none"
+               stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" focusable="false">
+            <line x1="4" y1="20" x2="20" y2="20"/>
+            <rect x="6" y="11" width="3" height="6"/><rect x="11" y="7" width="3" height="10"/><rect x="16" y="13" width="3" height="4"/>
+          </svg>Estadísticas
+        </a>
+      </li>
+      <li class="nav-item"><a class="btn btn-outline-secondary mr-2" href="#">Filtros</a></li>
+    </ul>
+    <div class="d-flex align-items-center ml-auto">
+      <span class="group_label mr-3">Número actual</span>
+      <span class="cartouche cartouche--crest d-inline-block mr-4" style="padding-top:20px;">
+        <svg class="voluta voluta--tl" style="width:30px;height:30px;top:0;" viewBox="0 0 64 64" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="0.9" stroke-linecap="round" d="M2 62 C2 34 14 8 40 4 C26 10 22 24 26 34 C29 41 38 42 42 36 C45 31 41 26 36 28 C40 27 43 31 41 35"/></svg>
+        <svg class="voluta voluta--tr" style="width:30px;height:30px;top:0;" viewBox="0 0 64 64" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="0.9" stroke-linecap="round" d="M2 62 C2 34 14 8 40 4 C26 10 22 24 26 34 C29 41 38 42 42 36 C45 31 41 26 36 28 C40 27 43 31 41 35"/></svg>
+        <label id="current_number" class="mb-0">13452</label>
+      </span>
+      <input class="form-control mr-2" type="search" id="search_number" style="max-width:160px" placeholder="Buscar número">
+      <button class="btn btn-outline-primary" type="button">Buscar</button>
+    </div>
+  </nav>
+
+  <div class="fit-main">
+    <div class="row">
+      <!-- ===== NumberForm — la ficha del décimo ===== -->
+      <div class="col-lg-4">
+        <div class="bg-light p-2 ficha-panel">
+          <span class="engrave-caps d-inline-block mb-2" style="font-size:20px;">Ficha del décimo</span>
+          <form class="form form-horizontal">
+            <div class="form-row mt-2"><label class="col-form-label col-sm-4">Estado</label>
+              <div class="col-sm-8"><select class="form-control"><option>Perfecto</option><option>Defectuoso</option><option>Falta</option></select></div></div>
+            <div class="form-row mt-2"><label class="col-form-label col-sm-4">Origen</label>
+              <div class="col-sm-8"><select class="form-control"><option>Navidad</option><option>Niño</option><option>Ordinario</option><option>Jueves</option></select></div></div>
+            <div class="form-row mt-2"><label class="col-form-label col-sm-4">Sorteo</label>
+              <div class="col-sm-8"><select class="form-control"><option>Sorteo 36</option></select></div></div>
+            <div class="form-row mt-2"><label class="col-form-label col-sm-4">Año</label>
+              <div class="col-sm-8"><select class="form-control"><option>1979</option></select></div></div>
+            <div class="form-row mt-2"><label class="col-form-label col-sm-4">Moneda</label>
+              <div class="col-sm-8"><select class="form-control"><option>Peseta</option><option>Euro</option></select></div></div>
+            <div class="form-row mt-2"><label class="col-form-label col-sm-4">Comunidad</label>
+              <div class="col-sm-8"><select class="form-control"><option>País Vasco</option><option>Cataluña</option><option>Galicia</option><option>Andalucía</option></select></div></div>
+            <div class="form-row mt-2"><label class="col-form-label col-sm-4">Provincia</label>
+              <div class="col-sm-8"><select class="form-control"><option>A Coruña</option><option>Álava / Araba</option><option>Gipuzkoa</option></select></div></div>
+            <div class="form-row mt-2"><label class="col-form-label col-sm-4">Municipio</label>
+              <div class="col-sm-8"><select class="form-control"><option>L'Hospitalet de Llobregat</option><option>Maó</option><option>Sant Cugat del Vallès</option><option>O Carballiño</option></select></div></div>
+            <div class="form-row mt-2"><label class="col-form-label col-sm-4">Número</label>
+              <div class="col-sm-8"><input class="form-control" value="36" type="text"></div></div>
+            <div class="form-row mt-2"><label class="col-form-label col-sm-4">Copias</label>
+              <div class="col-sm-8"><input class="form-control" value="1" type="text"></div></div>
+            <div class="form-row mt-3"><div class="col-sm-12"><button id="submit" class="btn btn-info btn-block">Guardar</button></div></div>
+          </form>
+        </div>
+      </div>
+
+      <!-- ===== La plana del álbum — la centena (the album page) ===== -->
+      <div class="col-lg-8">
+        <div class="orla orla--verde p-4">
+          <div class="text-center mb-2 album-head">
+            <div class="d-flex justify-content-center mb-2">
+              <svg class="roseta" viewBox="0 0 100 100" aria-hidden="true">
+                <g fill="none" stroke="currentColor" stroke-width="0.6">
+                  <ellipse cx="50" cy="50" rx="40" ry="15" transform="rotate(0 50 50)"/>
+                  <ellipse cx="50" cy="50" rx="40" ry="15" transform="rotate(30 50 50)"/>
+                  <ellipse cx="50" cy="50" rx="40" ry="15" transform="rotate(60 50 50)"/>
+                  <ellipse cx="50" cy="50" rx="40" ry="15" transform="rotate(90 50 50)"/>
+                  <ellipse cx="50" cy="50" rx="40" ry="15" transform="rotate(120 50 50)"/>
+                  <ellipse cx="50" cy="50" rx="40" ry="15" transform="rotate(150 50 50)"/>
+                  <circle cx="50" cy="50" r="6"/>
+                </g>
+              </svg>
+            </div>
+            <h3 class="mb-0">Centena 134<span style="color:var(--tinta-sepia)">00</span> – 134<span style="color:var(--tinta-sepia)">99</span></h3>
+          </div>
+          <div id="hundred_container" class="centena-grid"></div>
+
+          <hr class="hairline my-2">
+          <div class="album-legend d-flex flex-wrap justify-content-center" style="gap:1.2rem; font-family:var(--font-caps); font-size:16px;">
+            <span><span class="btn btn_number btn-success legend-chip mr-2">07</span>Perfecto</span>
+            <span><span class="btn btn_number btn-warning legend-chip mr-2">14</span>Defectuoso</span>
+            <span><span class="btn btn_number btn-secondary legend-chip mr-2">21</span>Falta</span>
+            <span><span class="btn btn_number btn-info legend-chip mr-2">35</span>Faltan datos</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="counter-footer on-green text-center py-4 mt-4">
+    <span class="engrave-caps align-middle">Los décimos de Ildefonso</span><br>
+    <span class="legal">Una colección privada · Desde 1955</span><br>
+    <span class="legal">Todos los números · Un décimo de cada administración de España</span>
+  </footer>
+
+  <script>
+    // Build the 00–99 décimo-chip grid with a deterministic status spread
+    function statusFor(n){
+      if (n % 7 === 0) return 'btn-warning';   // Defectuoso
+      if (n % 5 === 0) return 'btn-info';       // Faltan datos
+      if ((n * 13) % 3 === 0) return 'btn-secondary'; // Falta
+      return 'btn-success';                     // Perfecto
+    }
+    var c = document.getElementById('hundred_container');
+    for (var i = 0; i < 100; i++){
+      var nn = (i < 10 ? '0' : '') + i;
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.id = 'button_number_' + nn;
+      b.name = 'button_number_' + nn;
+      b.className = 'btn btn_number btn-lg ' + statusFor(i);
+      b.textContent = nn;
+      c.appendChild(b);
+    }
+  </script>
+</body>
+</html>

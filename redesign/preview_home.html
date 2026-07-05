@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Los Décimos de Ildefonso — Tablón</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="theme.css">
+  <style>
+    /* ---- fit one screen, no vertical scroll ---- */
+    html,body{ height:100%; }
+    body{ display:flex; flex-direction:column; overflow:hidden; }
+    .navbar{ flex:0 0 auto; }
+    .navbar.bg-light{ padding-top:.3rem; padding-bottom:.3rem; }
+    .fit-main{ flex:1 1 auto; min-height:0; display:flex; flex-direction:column; overflow:hidden; }
+    .hero-orla{ flex:0 0 auto; margin:.5rem .8rem!important; padding:.7rem 1.2rem!important; }
+    .hero-orla h1{ font-size:clamp(28px,4vw,42px)!important; margin-bottom:.15rem!important; }
+    .hero-orla .roseta{ width:36px!important; height:36px!important; }
+    .hero-orla .lead{ font-size:18px!important; margin-bottom:.15rem!important; line-height:1.4; }
+    .hero-orla .my-3{ margin-top:.3rem!important; margin-bottom:.3rem!important; }
+    .hero-orla .engrave-caps{ font-size:18px!important; }
+    .fit-body{ flex:1 1 auto; min-height:0; }
+    .fit-body > .row{ height:100%; margin:0; }
+    .fit-body > .row > [class^="col-"]{ height:100%; display:flex; flex-direction:column; min-height:0; }
+    .posts-head{ flex:0 0 auto; }
+    .posts-scroll{ flex:1 1 auto; min-height:0; overflow:auto; padding-right:.4rem; }
+    .posts-scroll .media:last-child{ margin-bottom:0!important; }
+
+    /* ---- quiet walnut colophon band, compact ---- */
+    .counter-footer{
+      flex:0 0 auto;
+      background: linear-gradient(180deg, var(--nogal-claro), var(--nogal));
+      color: var(--marfil);
+      border-top: 1px solid var(--nogal-claro);
+      font-family: var(--font-caps);
+      padding:.35rem 0!important; margin-top:0!important;
+    }
+    .counter-footer .engrave-caps{ font-size: 17px!important; }
+    .counter-footer .legal{ font-size: 13px!important; color: var(--marfil); opacity: .85; }
+  </style>
+</head>
+<body>
+  <!-- ===== El cabezal — a quiet engraved nameplate ===== -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="#">Los décimos de Ildefonso</a>
+    <span class="engrave-caps d-none d-lg-inline-block ml-3" style="font-size:18px;">Desde 1955</span>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav">
+        <li class="nav-item"><a class="nav-link active" href="#">Tablón</a></li>
+        <li class="nav-item"><a class="nav-link" href="#">Colección de números</a></li>
+        <li class="nav-item"><a class="nav-link" href="#">Colección de administraciones</a></li>
+      </ul>
+    </div>
+    <div>
+      <ul class="navbar-nav flex-row align-items-center">
+        <li class="nav-item mr-2">
+          <input type="password" class="form-control" id="edit_mode_password" placeholder="Identifíquese para editar">
+        </li>
+        <li class="nav-item">
+          <button type="submit" class="btn btn-success">Identificarse</button>
+        </li>
+      </ul>
+    </div>
+  </nav>
+
+  <div class="container-fluid p-0 fit-main">
+    <!-- ===== Portada — la cartela grabada (the engraved cartouche plate) ===== -->
+    <div class="orla cartouche text-center hero-orla">
+      <svg class="voluta voluta--tl" viewBox="0 0 64 64" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="0.9" stroke-linecap="round" d="M2 62 C2 34 14 8 40 4 C26 10 22 24 26 34 C29 41 38 42 42 36 C45 31 41 26 36 28 C40 27 43 31 41 35"/></svg>
+      <svg class="voluta voluta--tr" viewBox="0 0 64 64" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="0.9" stroke-linecap="round" d="M2 62 C2 34 14 8 40 4 C26 10 22 24 26 34 C29 41 38 42 42 36 C45 31 41 26 36 28 C40 27 43 31 41 35"/></svg>
+      <svg class="voluta voluta--bl" viewBox="0 0 64 64" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="0.9" stroke-linecap="round" d="M2 62 C2 34 14 8 40 4 C26 10 22 24 26 34 C29 41 38 42 42 36 C45 31 41 26 36 28 C40 27 43 31 41 35"/></svg>
+      <svg class="voluta voluta--br" viewBox="0 0 64 64" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="0.9" stroke-linecap="round" d="M2 62 C2 34 14 8 40 4 C26 10 22 24 26 34 C29 41 38 42 42 36 C45 31 41 26 36 28 C40 27 43 31 41 35"/></svg>
+
+      <h1 class="mb-2">Los décimos de Ildefonso</h1>
+      <div class="engrave-caps" style="font-size:20px;">· Coleccionando desde 1955 ·</div>
+
+      <div class="d-flex justify-content-center my-3">
+        <svg class="roseta" viewBox="0 0 100 100" aria-hidden="true">
+          <g fill="none" stroke="currentColor" stroke-width="0.6">
+            <ellipse cx="50" cy="50" rx="40" ry="15" transform="rotate(0 50 50)"/>
+            <ellipse cx="50" cy="50" rx="40" ry="15" transform="rotate(30 50 50)"/>
+            <ellipse cx="50" cy="50" rx="40" ry="15" transform="rotate(60 50 50)"/>
+            <ellipse cx="50" cy="50" rx="40" ry="15" transform="rotate(90 50 50)"/>
+            <ellipse cx="50" cy="50" rx="40" ry="15" transform="rotate(120 50 50)"/>
+            <ellipse cx="50" cy="50" rx="40" ry="15" transform="rotate(150 50 50)"/>
+            <circle cx="50" cy="50" r="6"/>
+          </g>
+        </svg>
+      </div>
+
+      <p class="lead mb-2">Un álbum privado de décimos: la colección de todos los números,
+        y un décimo de cada administración de lotería de España.</p>
+      <p class="lead mb-0">Arriba encontrará mis dos colecciones. Si desea dejarme unas líneas,
+        este es su lugar.</p>
+    </div>
+
+    <div class="container fit-body">
+      <div class="row">
+        <!-- ===== Tablón — las hojas del álbum (comment leaves) ===== -->
+        <div class="col-sm-7 px-3 border-right border-secondary" id="number_info_posts">
+          <div class="text-center posts-head" style="margin:2px 0 8px;">
+            <div class="engrave-caps" style="font-size:22px;">Últimas líneas del cuaderno</div>
+            <svg class="divider" viewBox="0 0 240 16" width="240" height="16" role="presentation">
+              <g fill="none" stroke="currentColor" stroke-width="0.8">
+                <line x1="0" y1="8" x2="96" y2="8"/><line x1="144" y1="8" x2="240" y2="8"/>
+                <path d="M96 8 C104 8 108 3 114 5 C120 7 117 12 111 11 M144 8 C136 8 132 3 126 5 C120 7 123 12 129 11"/>
+              </g><circle cx="120" cy="8" r="1.6" fill="currentColor"/>
+            </svg>
+          </div>
+
+          <div class="posts-scroll">
+          <div class="media my-3">
+            <img class="d-flex rounded-circle avatar mr-3" width="56" height="56"
+                 src="https://www.gravatar.com/avatar/3b3be63a4c2a439b013787725dfce802?d=identicon&s=112" alt="Avatar">
+            <div class="media-body">
+              <h5 class="mt-0 font-weight-bold">José María Goikoetxea</h5>
+              Ildefonso, qué bien conservada está la orla del décimo de la Administración nº 1 de
+              A Coruña que mostró el otro día; el grabado de las volutas es una delicia. Enhorabuena
+              por la colección.
+            </div>
+          </div>
+
+          <div class="media my-3">
+            <img class="d-flex rounded-circle avatar mr-3" width="56" height="56"
+                 src="https://www.gravatar.com/avatar/5d41402abc4b2a76b9719d911017c592?d=identicon&s=112" alt="Avatar">
+            <div class="media-body">
+              <h5 class="mt-0 font-weight-bold">Núria Vilaró i Puig</h5>
+              Vinc de L'Alfàs del Pi. M'encanta com tens catalogats els dècims; la filigrana dels
+              més antics és una meravella d'ofici. Quin goig de col·lecció!
+            </div>
+          </div>
+
+          <div class="media my-3">
+            <img class="d-flex rounded-circle avatar mr-3" width="56" height="56"
+                 src="https://www.gravatar.com/avatar/aab9e1de16f38176f86d7a92ba337a8d?d=identicon&s=112" alt="Avatar">
+            <div class="media-body">
+              <h5 class="mt-0 font-weight-bold">Begoña Etxebarria</h5>
+              Desde Bilbao / Bilbo: mi abuelo guardaba sus décimos en una vitrina de nogal, igual
+              que usted. Gracias por cuidar este oficio del grabado y la estampa.
+            </div>
+          </div>
+          </div>
+        </div>
+
+        <!-- ===== Dejar unas líneas (comment form) ===== -->
+        <div class="col-sm-5 px-3" id="number_info_form">
+          <div class="bg-light p-3" style="margin-top:18px;">
+            <span class="engrave-caps mb-3 d-inline-block" style="font-size:22px;">Deje unas líneas</span>
+            <form class="form form-horizontal mt-3" role="form">
+              <div class="form-row required">
+                <label class="col-form-label col-sm-4">Nombre</label>
+                <div class="col-sm-8"><input class="form-control" id="name" name="name" type="text"></div>
+              </div>
+              <div class="form-row required mt-2">
+                <label class="col-form-label col-sm-4">Correo</label>
+                <div class="col-sm-8"><input class="form-control" id="email" name="email" type="email"></div>
+              </div>
+              <div class="form-row required mt-2">
+                <label class="col-form-label col-sm-4">Mensaje</label>
+                <div class="col-sm-8"><textarea class="form-control" id="post" name="post" rows="4"></textarea></div>
+              </div>
+              <div class="form-row mt-3">
+                <div class="col-sm-12 text-right">
+                  <button type="submit" id="submit" class="btn btn-info">Añadir comentario</button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="counter-footer on-green text-center py-4 mt-3">
+    <span class="engrave-caps align-middle">Los décimos de Ildefonso</span><br>
+    <span class="legal">Una colección privada · Desde 1955</span><br>
+    <span class="legal">Todos los números · Un décimo de cada administración de España</span>
+  </footer>
+</body>
+</html>

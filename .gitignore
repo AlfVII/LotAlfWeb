@@ -1,0 +1,13 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.env
+
+# Frontend build artifacts
+frontend/node_modules/
+frontend/dist/
+
+# Flask / local
+instance/
+*.db-journal

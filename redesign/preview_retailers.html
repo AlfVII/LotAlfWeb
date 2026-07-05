@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Los Décimos de Ildefonso — Colección de administraciones</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css">
+  <link rel="stylesheet" href="theme.css">
+  <style>
+    /* ---- fit one screen, no vertical scroll ---- */
+    html,body{ height:100%; }
+    body{ display:flex; flex-direction:column; overflow:hidden; }
+    .navbar{ flex:0 0 auto; }
+    .navbar.bg-light{ padding-top:.3rem; padding-bottom:.3rem; }
+    .navbar.bg-light.mt-2{ margin-top:.4rem!important; }
+    .fit-main{ flex:1 1 auto; min-height:0; display:flex; flex-direction:column; padding:.45rem .6rem; }
+    .fit-main > .row{ flex:1 1 auto; min-height:0; margin:0; }
+    .fit-main > .row > [class^="col-"]{ height:100%; display:flex; flex-direction:column; min-height:0; }
+    .ficha-panel{ flex:1 1 auto; min-height:0; overflow:auto; }
+    .ficha-panel .form-row{ margin-top:.22rem!important; }
+    .ficha-panel .form-control{ min-height:34px; }
+    .ficha-panel .col-form-label{ padding-top:.2rem; padding-bottom:.2rem; }
+    #map_container{ flex:1 1 auto; min-height:0; }
+    #map{ height:100%; }
+    .map-cap{ flex:0 0 auto; }
+    .radio label{ display:block; margin-bottom:.1rem; }
+    input[type=radio], input[type=checkbox]{ accent-color: var(--verde-botella); width:17px; height:17px; vertical-align:-2px; }
+
+    /* ---- quiet walnut colophon band, compact ---- */
+    .counter-footer{ flex:0 0 auto;
+      background:linear-gradient(180deg,var(--nogal-claro),var(--nogal));
+      color:var(--marfil); border-top:1px solid var(--nogal-claro); font-family:var(--font-caps);
+      padding:.35rem 0!important; margin-top:0!important; }
+    .counter-footer .engrave-caps{ font-size:17px!important; }
+    .counter-footer .legal{ font-size:13px!important; color:var(--marfil); opacity:.85; }
+  </style>
+</head>
+<body>
+  <!-- ===== El cabezal ===== -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="#">Los décimos de Ildefonso</a>
+    <span class="engrave-caps d-none d-lg-inline-block ml-3" style="font-size:18px;">Desde 1955</span>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav">
+        <li class="nav-item"><a class="nav-link" href="#">Tablón</a></li>
+        <li class="nav-item"><a class="nav-link" href="#">Colección de números</a></li>
+        <li class="nav-item"><a class="nav-link active" href="#">Colección de administraciones</a></li>
+      </ul>
+    </div>
+    <div>
+      <ul class="navbar-nav flex-row align-items-center">
+        <li class="nav-item mr-2"><input type="password" class="form-control" id="edit_mode_password" placeholder="Identifíquese para editar"></li>
+        <li class="nav-item"><button class="btn btn-success">Identificarse</button></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- ===== Sub-nav: secciones + buscar localidad ===== -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-light mx-2 mt-2">
+    <ul class="navbar-nav">
+      <li class="nav-item"><a class="btn btn-outline-info mr-2" href="#">Mostrar todas</a></li>
+      <li class="nav-item"><a class="btn btn-outline-info mr-2" href="#">Mostrar todas en la colección</a></li>
+      <li class="nav-item"><a class="btn btn-outline-secondary mr-2" href="#">Estadísticas</a></li>
+    </ul>
+    <form class="form-inline ml-auto">
+      <input class="form-control mr-2" type="search" id="search_town" style="max-width:200px" placeholder="Buscar localidad">
+      <button class="btn btn-outline-primary" type="button">Buscar</button>
+    </form>
+  </nav>
+
+  <div class="fit-main">
+    <div class="row">
+      <!-- ===== Ficha de la administración ===== -->
+      <div class="col-lg-3">
+        <div class="bg-light p-2 ficha-panel">
+          <span class="nameplate d-inline-block mb-2">Ficha de la administración</span>
+          <form class="form form-horizontal">
+            <div class="form-row mt-2"><label class="col-form-label col-sm-5">Comunidad</label>
+              <div class="col-sm-7"><select class="form-control" id="retailer_region" name="retailer_region"><option>Galicia</option><option>Cataluña</option><option>País Vasco</option><option>Comunidad de Madrid</option></select></div></div>
+            <div class="form-row mt-2"><label class="col-form-label col-sm-5">Provincia</label>
+              <div class="col-sm-7"><select class="form-control" id="retailer_province" name="retailer_province"><option>A Coruña</option><option>Ourense</option><option>Pontevedra</option></select></div></div>
+            <div class="form-row mt-2"><label class="col-form-label col-sm-5">Municipio</label>
+              <div class="col-sm-7"><select class="form-control" id="retailer_town" name="retailer_town"><option>A Coruña</option><option>O Carballiño</option><option>Sant Cugat del Vallès</option><option>Maó</option></select></div></div>
+            <div class="form-row mt-2"><label class="col-form-label col-sm-5">Número</label>
+              <div class="col-sm-7"><input class="form-control" id="retailer_number" name="retailer_number" value="1"></div></div>
+            <div class="form-row mt-2"><label class="col-form-label col-sm-5">Nombre</label>
+              <div class="col-sm-7"><input class="form-control" id="retailer_name" name="retailer_name" value="La Pajarita"></div></div>
+            <div class="form-row mt-2"><label class="col-form-label col-sm-5">Calle</label>
+              <div class="col-sm-7"><input class="form-control" id="retailer_street" name="retailer_street" value="Rúa Real"></div></div>
+            <div class="form-row mt-2"><label class="col-form-label col-sm-5">Nº de calle</label>
+              <div class="col-sm-7"><input class="form-control" id="retailer_street_number" name="retailer_street_number" value="20"></div></div>
+            <div class="form-row mt-2"><label class="col-form-label col-sm-5">Cód. postal</label>
+              <div class="col-sm-7"><input class="form-control" id="retailer_postal_code" name="retailer_postal_code" value="15003"></div></div>
+            <div class="form-row mt-2"><label class="col-form-label col-sm-5">Nº teléfono</label>
+              <div class="col-sm-7"><input class="form-control" id="retailer_telephone" name="retailer_telephone" value="981 22 11 00"></div></div>
+            <div class="form-row mt-2"><label class="col-form-label col-sm-5">Correo elec.</label>
+              <div class="col-sm-7"><input class="form-control" id="retailer_email" name="retailer_email" value=""></div></div>
+            <div class="form-row mt-3">
+              <div class="col-12 radio">
+                <label><input type="radio" name="owned" value="Owned" checked> Está en la colección</label>
+                <label><input type="radio" name="owned" value="Not owned"> Falta en la colección</label>
+              </div>
+            </div>
+            <div class="form-row mt-2"><div class="col-12"><button id="submit_save" class="btn btn-info btn-block">Guardar</button></div></div>
+          </form>
+        </div>
+      </div>
+
+      <!-- ===== El mapa — la orla grabada ===== -->
+      <div class="col-lg-5">
+        <div id="map_container">
+          <div id="map"></div>
+        </div>
+        <div class="text-center mt-1 map-cap"><span class="engrave-caps" style="font-size:16px;">Las administraciones de España</span></div>
+      </div>
+
+      <!-- ===== La estampa — fotografía del décimo / la administración ===== -->
+      <div class="col-lg-4">
+        <div id="screenshot" style="text-align:center;">
+          <div id="visualization">
+            <img class="screenshot" id="image" alt="Fotografía de la administración"
+                 src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='360' height='250'%3E%3Crect width='360' height='250' fill='%23F4ECD8'/%3E%3Cg fill='none' stroke='%23574231' stroke-width='1'%3E%3Crect x='14' y='14' width='332' height='222'/%3E%3Crect x='20' y='20' width='320' height='210'/%3E%3C/g%3E%3Cg fill='%238A745C' font-family='Georgia,serif' text-anchor='middle'%3E%3Ctext x='180' y='120' font-size='17' letter-spacing='3'%3ESIN FOTOGRAF%C3%8DA%3C/text%3E%3Ctext x='180' y='150' font-size='13'%3EUse %C2%ABIniciar captura%C2%BB%3C/text%3E%3C/g%3E%3C/svg%3E">
+          </div>
+          <div id="screen_button" class="mt-2">
+            <button class="btn btn-outline-success" id="start_video_button">Iniciar captura</button>
+          </div>
+        </div>
+        <div class="bg-light p-3 mt-3">
+          <span class="engrave-caps d-inline-block mb-1" style="font-size:18px;">Administración nº 1 · A Coruña</span>
+          <div style="font-family:var(--font-body); color:var(--tinta-sepia);">«La Pajarita» — Rúa Real, 20. Una de las administraciones más antiguas de la ciudad.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="counter-footer on-green text-center py-4 mt-4">
+    <span class="engrave-caps align-middle">Los décimos de Ildefonso</span><br>
+    <span class="legal">Una colección privada · Desde 1955</span><br>
+    <span class="legal">Todos los números · Un décimo de cada administración de España</span>
+  </footer>
+
+  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+  <script>
+    var map = L.map('map', { scrollWheelZoom:false }).setView([40.2, -3.6], 6);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+      { attribution:'© OpenStreetMap', maxZoom:18 }).addTo(map);
+
+    // En la colección (verde botella) — décimos que ya tiene
+    var owned = [
+      [40.4168,-3.7038,'Madrid · Admón nº 67'],
+      [41.3825, 2.1769,'Barcelona · Admón nº 1'],
+      [43.3623,-8.4115,'A Coruña · Admón nº 1 «La Pajarita»'],
+      [43.2630,-2.9350,'Bilbao / Bilbo · Admón nº 4'],
+      [37.3886,-5.9823,'Sevilla · Admón nº 3'],
+      [39.4699, 2.6501,'Maó · Admón nº 2']
+    ];
+    // Por conseguir (sepia) — administraciones aún sin décimo
+    var missing = [
+      [39.4699,-0.3763,'València · Admón nº 5'],
+      [37.9923,-1.1307,'Murcia · Admón nº 2'],
+      [41.6488,-0.8891,'Zaragoza · Admón nº 9'],
+      [42.8782,-8.5448,'Santiago de Compostela · Admón nº 1'],
+      [28.4636,-16.2518,'Santa Cruz de Tenerife · Admón nº 3']
+    ];
+    owned.forEach(function(a){
+      L.circleMarker([a[0],a[1]], { radius:8, color:'#1C1812', weight:1, fillColor:'#1E4D34', fillOpacity:.92 })
+        .addTo(map).bindPopup(a[2]);
+    });
+    missing.forEach(function(a){
+      L.circleMarker([a[0],a[1]], { radius:7, color:'#574231', weight:1.5, fillColor:'#F4ECD8', fillOpacity:.85 })
+        .addTo(map).bindPopup(a[2]);
+    });
+  </script>
+</body>
+</html>
