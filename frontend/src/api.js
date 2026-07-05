@@ -51,7 +51,8 @@ export const api = {
   // stats
   statsNumbers: () => req('/api/stats/numbers'),
   statsRetailers: () => req('/api/stats/retailers'),
-  // scanner (Plustek D620)
+  // scanner (Plustek D620) — two phases: duplex (scan) then read (OCR)
   scanDuplex: () => req('/api/scan/duplex', { method: 'POST' }),
+  scanRead: (faces) => req('/api/scan/read', { method: 'POST', body: JSON.stringify(faces) }),
   scanDecimo: () => req('/api/scan/decimo', { method: 'POST' }),
 }

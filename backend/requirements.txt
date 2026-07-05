@@ -7,3 +7,4 @@ itsdangerous
 python-dotenv
 python-multipart
 anthropic
+pillow

@@ -11,3 +11,8 @@ frontend/dist/
 # Flask / local
 instance/
 *.db-journal
+
+# Rebuild dev environment / local tooling
+backend/.venv/
+*.log
+.claude/

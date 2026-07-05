@@ -1,17 +1,21 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { api } from '../api'
 import { useAuth } from '../stores/auth'
 import RetailerMap from '../components/RetailerMap.vue'
 
 const auth = useAuth()
 const markers = ref([])
+const showZoom = ref(false)
+// Note: the scanner script (tools/scan_duplex.ps1) already rotates both faces to
+// upright landscape, so the images arrive correctly oriented — no client-side
+// rotation needed here (and the OCR gets upright images too).
 const regions = ref([])
 const provinces = ref([])
 const towns = ref([])
 const searchTown = ref('')
 const saving = ref(false)
-const scanning = ref(false)
+const scanning = ref('')  // '' | 'escaneando' | 'leyendo'
 const PLACEHOLDER = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='360' height='250'%3E%3Crect width='360' height='250' fill='%23F4ECD8'/%3E%3Cg fill='none' stroke='%23574231' stroke-width='1'%3E%3Crect x='14' y='14' width='332' height='222'/%3E%3Crect x='20' y='20' width='320' height='210'/%3E%3C/g%3E%3Cg fill='%238A745C' font-family='Georgia,serif' text-anchor='middle'%3E%3Ctext x='180' y='120' font-size='17' letter-spacing='3'%3ESIN FOTOGRAF%C3%8DA%3C/text%3E%3C/g%3E%3C/svg%3E"
 const image = ref(PLACEHOLDER)
 const imageBack = ref(null)
@@ -78,6 +82,15 @@ async function save() {
   } catch (e) { alert(e.message) } finally { saving.value = false }
 }
 
+// A <select> only shows a value that exactly matches an option. The OCR returns
+// free-text place names, so snap each to the matching dropdown option ignoring
+// case and accents (e.g. "navas de san juan" -> "Navas de San Juan").
+function snapToOption(value, options) {
+  if (!value) return value
+  const norm = (s) => s.toString().normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim()
+  return options.find((o) => norm(o) === norm(value)) || value
+}
+
 async function fillFromExtracted(ex) {
   if (!ex) return
   const f = { ...form.value, owned: 'Owned' }
@@ -85,35 +98,44 @@ async function fillFromExtracted(ex) {
     'retailer_name', 'retailer_street', 'retailer_street_number', 'retailer_postal_code', 'retailer_telephone']) {
     if (ex[k] != null && ex[k] !== '') f[k] = ex[k]
   }
-  form.value = f
+  // Load the cascading option lists, snapping each field to a real option as we go.
   if (f.retailer_region && f.retailer_region !== 'Default') {
+    f.retailer_region = snapToOption(f.retailer_region, regions.value)
     try { provinces.value = await api.provinces(f.retailer_region) } catch (e) { /* ignore */ }
+    f.retailer_province = snapToOption(f.retailer_province, provinces.value)
   }
   if (f.retailer_province && f.retailer_province !== 'Default') {
     try { towns.value = await api.towns(f.retailer_province) } catch (e) { /* ignore */ }
+    f.retailer_town = snapToOption(f.retailer_town, towns.value)
   }
+  form.value = f
 }
 
 async function scanDecimo() {
-  scanning.value = true
   ocrNote.value = ''
   try {
-    const { front, back, extracted, ocr_error } = await api.scanDecimo()
-    if (front) image.value = 'data:image/jpeg;base64,' + front
-    imageBack.value = back ? 'data:image/jpeg;base64,' + back : null
+    scanning.value = 'escaneando'
+    const { front, back } = await api.scanDuplex()
+    scanning.value = 'leyendo'
+    const { front: f2, back: b2, extracted, ocr_error } = await api.scanRead({ front, back })
+    if (f2) image.value = 'data:image/jpeg;base64,' + f2
+    imageBack.value = b2 ? 'data:image/jpeg;base64,' + b2 : null
     if (extracted) {
       await fillFromExtracted(extracted)
       ocrNote.value = 'Datos leídos del sello del décimo — revíselos y pulse Guardar.'
     } else {
       ocrNote.value = ocr_error ? `Escaneado (OCR no disponible: ${ocr_error})` : 'Escaneado.'
     }
-  } catch (e) { alert(e.message) } finally { scanning.value = false }
+  } catch (e) { alert(e.message) } finally { scanning.value = '' }
 }
 
+function onKey(e) { if (e.key === 'Escape') showZoom.value = false }
 onMounted(async () => {
+  window.addEventListener('keydown', onKey)
   try { regions.value = await api.regions() } catch (e) { regions.value = [] }
   await loadAll(true)
 })
+onUnmounted(() => window.removeEventListener('keydown', onKey))
 </script>
 
 <template>
@@ -175,16 +197,32 @@ onMounted(async () => {
         <!-- la estampa -->
         <div class="col-lg-4">
           <div id="screenshot" style="text-align:center;">
-            <div id="visualization"><img class="screenshot" id="image" :src="image" alt="anverso" /></div>
-            <img v-if="imageBack" class="screenshot mt-2" :src="imageBack" alt="reverso" />
+            <div id="visualization" class="estampa-slot">
+              <img class="screenshot estampa" id="image" :src="image" alt="anverso" @click="showZoom = true" title="Ampliar" />
+            </div>
+            <div v-if="imageBack" class="estampa-slot mt-2">
+              <img class="screenshot estampa" :src="imageBack" alt="reverso" @click="showZoom = true" title="Ampliar" />
+            </div>
+            <div class="mt-2" v-if="image !== PLACEHOLDER">
+              <button class="btn btn-outline-secondary btn-sm" @click="showZoom = true">🔍 Ampliar</button>
+            </div>
             <div id="screen_button" class="mt-2" v-if="auth.isEditor">
-              <button class="btn btn-outline-success btn-block" @click="scanDecimo" :disabled="scanning">
-                {{ scanning ? 'Escaneando…' : 'Escanear décimo (ambas caras)' }}
+              <button class="btn btn-outline-success btn-block" @click="scanDecimo" :disabled="!!scanning">
+                {{ scanning === 'escaneando' ? 'Escaneando…' : scanning === 'leyendo' ? 'Leyendo…' : 'Escanear décimo (ambas caras)' }}
               </button>
             </div>
             <div v-if="ocrNote" class="mt-1" style="font-family:var(--font-caps);font-size:13px;color:var(--tinta-sepia)">{{ ocrNote }}</div>
           </div>
         </div>
+      </div>
+    </div>
+
+    <!-- Zoom modal: full-size front + back -->
+    <div v-if="showZoom" class="zoom-overlay" @click="showZoom = false">
+      <button class="zoom-close" @click.stop="showZoom = false" aria-label="Cerrar">×</button>
+      <div class="zoom-body" @click.stop>
+        <img class="zoom-img" :src="image" alt="anverso ampliado" />
+        <img v-if="imageBack" class="zoom-img" :src="imageBack" alt="reverso ampliado" />
       </div>
     </div>
   </div>
@@ -203,4 +241,42 @@ onMounted(async () => {
 .map-cap { flex: 0 0 auto; }
 .radio label { display: block; margin-bottom: .1rem; }
 input[type=radio] { accent-color: var(--verde-botella); width: 17px; height: 17px; vertical-align: -2px; }
+
+/* Scanned décimo: fit within the panel instead of rendering at native size */
+.estampa-slot { display: flex; justify-content: center; }
+.estampa {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  max-height: 32vh;      /* keep both faces visible without overflowing the column */
+  object-fit: contain;
+  cursor: zoom-in;
+}
+
+/* Zoom modal */
+.zoom-overlay {
+  position: fixed; inset: 0; z-index: 1080;
+  background: rgba(20, 14, 8, 0.82);
+  display: flex; align-items: center; justify-content: center;
+  padding: 3vh 2vw; cursor: zoom-out;
+}
+.zoom-body {
+  display: flex; flex-wrap: wrap; gap: 14px;
+  align-items: center; justify-content: center;
+  max-height: 94vh; overflow: auto; cursor: default;
+}
+.zoom-img {
+  max-width: 46vw; max-height: 90vh;
+  height: auto; object-fit: contain;
+  border: 1px solid var(--nogal, #574231);
+  background: var(--crema, #f4ecd8);
+  box-shadow: 0 6px 30px rgba(0,0,0,.5);
+}
+.zoom-close {
+  position: fixed; top: 14px; right: 20px; z-index: 1090;
+  width: 44px; height: 44px; border-radius: 50%;
+  border: none; background: rgba(255,255,255,.9); color: #333;
+  font-size: 28px; line-height: 1; cursor: pointer;
+}
+@media (max-width: 900px) { .zoom-img { max-width: 92vw; } }
 </style>

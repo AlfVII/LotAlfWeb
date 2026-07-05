@@ -35,16 +35,37 @@ param(
   [int]$Dpi         = 600,
   [ValidateSet('jpg','png')] [string]$Format = 'jpg',
   [switch]$NoCrop,
-  [switch]$Deskew   # NAPS2 software deskew. Off by default: it fills corners black and
-                    # misfires on sparse/blank card sides. Only useful for text-dense docs.
+  [switch]$NoRotate,  # by default the two faces are rotated to upright landscape (the décimo
+                      # feeds short-edge-first, so it scans 90° rotated; front/back are 180° apart).
+  [switch]$NoDeskew,  # NAPS2 software deskew is ON by default (décimos are text-dense so it
+                      # behaves well); it straightens a skewed feed and the auto-crop then
+                      # trims the black corners it introduces. Pass -NoDeskew to disable.
+  [string]$Naps2Path         # Explicit path to NAPS2.Console.exe. If omitted, auto-detected
+                             # (see Resolve-Naps2 below) so no per-machine edit is needed.
 )
 
 $ErrorActionPreference = 'Stop'
 Add-Type -AssemblyName System.Drawing
-$naps2  = 'C:\Users\Alfonso\Tools\naps2\App\NAPS2.Console.exe'
-$device = 'Plustek MobileOffice A6 Duplex BU'   # D620 TWAIN source (as NAPS2 reports it)
 
-if (-not (Test-Path $naps2)) { throw "NAPS2 console not found at $naps2" }
+# --- locate NAPS2.Console.exe without hardcoding a username ---
+# Order: -Naps2Path arg > $env:NAPS2_CONSOLE > per-user portable (USERPROFILE) >
+# common install locations. This makes the script portable across machines/users.
+function Resolve-Naps2 {
+  param([string]$Override)
+  $candidates = @(
+    $Override,
+    $env:NAPS2_CONSOLE,
+    (Join-Path $env:USERPROFILE 'Tools\naps2\App\NAPS2.Console.exe'),
+    'C:\Program Files\NAPS2\NAPS2.Console.exe',
+    'C:\Program Files (x86)\NAPS2\NAPS2.Console.exe'
+  ) | Where-Object { $_ }
+  foreach ($c in $candidates) { if (Test-Path $c) { return $c } }
+  throw ("NAPS2.Console.exe not found. Looked in:`n  " + ($candidates -join "`n  ") +
+         "`nInstall the NAPS2 portable zip under %USERPROFILE%\Tools\naps2\ " +
+         "or pass -Naps2Path 'C:\path\to\NAPS2.Console.exe'.")
+}
+$naps2  = Resolve-Naps2 -Override $Naps2Path
+$device = 'Plustek MobileOffice A6 Duplex BU'   # D620 TWAIN source (as NAPS2 reports it)
 New-Item -ItemType Directory -Force -Path $OutDir | Out-Null
 
 # --- content-aware crop: trim near-uniform dark border (the scanner feeder edge) ---
@@ -109,12 +130,12 @@ Get-ChildItem $OutDir -Filter ("{0}_*.{1}" -f $BaseName, $Format) -ErrorAction S
 $naps2Args = @('-o', $pattern, '--noprofile', '--driver', 'twain', '--device', $device,
                '--source', 'duplex', '--dpi', $Dpi, '--bitdepth', 'color',
                '--jpegquality', '92', '--force')
-if ($Deskew) { $naps2Args += '--deskew' }
-Write-Host "Scanning duplex (both sides, one pass) at $Dpi dpi, 24-bit color$(if($Deskew){', deskew'})..."
+if (-not $NoDeskew) { $naps2Args += '--deskew' }
+Write-Host "Scanning duplex (both sides, one pass) at $Dpi dpi, 24-bit color$(if(-not $NoDeskew){', deskew'})..."
 $log = & $naps2 @naps2Args 2>&1
 $log | ForEach-Object { Write-Host "  $_" }
 if ($log -match 'No scanned pages') {
-  Write-Warning "Feeder empty — load the card and push it in until the light goes SOLID, then rerun."
+  Write-Warning "Feeder empty -- load the card and push it in until the light goes SOLID, then rerun."
   return
 }
 if ($LASTEXITCODE -ne 0) { throw "NAPS2 exited $LASTEXITCODE" }
@@ -129,6 +150,21 @@ foreach ($f in $files) {
   if (-not $NoCrop) {
     $msg = Invoke-AutoCrop -Path $f.FullName
     Write-Host ("  cropped {0}: {1}" -f $f.Name, $msg)
+  }
+  if (-not $NoRotate) {
+    # Front (_1) needs 90° CCW; back (_2) needs 90° CW — so both read upright landscape.
+    $rot = if ($f.Name -match '_1\.') { [System.Drawing.RotateFlipType]::Rotate270FlipNone }
+           elseif ($f.Name -match '_2\.') { [System.Drawing.RotateFlipType]::Rotate90FlipNone }
+           else { $null }
+    if ($rot) {
+      $b = New-Object System.Drawing.Bitmap $f.FullName
+      $b.RotateFlip($rot)
+      $fmt = if ($f.Name -match '\.png$') { [System.Drawing.Imaging.ImageFormat]::Png } else { [System.Drawing.Imaging.ImageFormat]::Jpeg }
+      $tmp = [System.IO.Path]::GetTempFileName()
+      $b.Save($tmp, $fmt); $b.Dispose()          # release the file handle before overwriting
+      Move-Item -Force -LiteralPath $tmp -Destination $f.FullName
+      Write-Host ("  rotated {0} upright" -f $f.Name)
+    }
   }
 }
 Write-Host ""
