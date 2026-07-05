@@ -17,6 +17,20 @@ customer-site install repeats cleanly. Everything below was actually run and ver
 | Duplex scan (script + `/api/scan/duplex`) | ✅ both faces captured; API returns valid base64 JPEGs |
 | Postgres `db_ready:true` | ⚠️ needs the real DB creds (live in hosting platform, not in repo) |
 
+## 0. Deployment topology — where does the scanner live?
+The scanner is USB/TWAIN hardware and can only be driven from the machine it's
+plugged into. Two supported layouts:
+
+- **All-in-one** (backend on the scanner machine): the backend's own
+  `/api/scan/duplex` runs the scan. Leave `VITE_SCAN_BASE` empty. Nothing extra.
+- **Split** (backend on a remote server, scanner on the user's PC): install the
+  small **local scan agent** on the user's PC — it does the scan step; OCR/DB/save
+  stay on the remote backend. Full guide: **[`scan-agent/README.md`](scan-agent/README.md)**.
+  Set `VITE_SCAN_BASE=http://localhost:8765` (+ matching `VITE_SCAN_TOKEN`) in the
+  frontend. Verified: agent scans a real décimo and returns both faces; the remote
+  `/api/scan/read` does the OCR. The two-endpoint split (`/duplex` scan vs `/read`
+  OCR) is what makes this clean — `/read` needs no scanner and runs anywhere.
+
 ## 1. Python — pin the venv to 3.12
 The default `python` may be a bleeding-edge build (3.14 on the rehearsal box) that
 lacks prebuilt wheels for `psycopg2-binary`. Create the venv explicitly with 3.12:

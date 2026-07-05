@@ -2,6 +2,26 @@
 // In dev, Vite proxies /api -> http://localhost:8000 (see vite.config.js).
 const BASE = import.meta.env.VITE_API_BASE || ''
 
+// Split deployment: the scanner is hardware on the USER's machine, so the scan
+// step is served by a local "scan agent" (scan-agent/), while OCR/DB stay on the
+// remote backend. Set VITE_SCAN_BASE (e.g. http://localhost:8765) to route the
+// scan there. Left empty (all-in-one/local dev) it falls back to the backend's
+// own /api/scan/duplex. VITE_SCAN_TOKEN, if set, must match the agent's SCAN_TOKEN.
+const SCAN_BASE = import.meta.env.VITE_SCAN_BASE || ''
+const SCAN_TOKEN = import.meta.env.VITE_SCAN_TOKEN || ''
+
+async function scanAgent(path) {
+  const res = await fetch(SCAN_BASE + path, {
+    method: 'POST',
+    headers: SCAN_TOKEN ? { 'X-Scan-Token': SCAN_TOKEN } : {},
+  })
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ detail: res.statusText }))
+    throw new Error(err.detail || 'No se pudo escanear (¿está el agente de escaneo en marcha?)')
+  }
+  return res.json()
+}
+
 function authHeaders() {
   const t = localStorage.getItem('lotalf_token')
   return t ? { Authorization: `Bearer ${t}` } : {}
@@ -51,8 +71,8 @@ export const api = {
   // stats
   statsNumbers: () => req('/api/stats/numbers'),
   statsRetailers: () => req('/api/stats/retailers'),
-  // scanner (Plustek D620) — two phases: duplex (scan) then read (OCR)
-  scanDuplex: () => req('/api/scan/duplex', { method: 'POST' }),
+  // scanner (Plustek D620) — two phases: duplex (scan, LOCAL agent) then read (OCR, remote)
+  scanDuplex: () => (SCAN_BASE ? scanAgent('/duplex') : req('/api/scan/duplex', { method: 'POST' })),
   scanRead: (faces) => req('/api/scan/read', { method: 'POST', body: JSON.stringify(faces) }),
   scanDecimo: () => req('/api/scan/decimo', { method: 'POST' }),
 }

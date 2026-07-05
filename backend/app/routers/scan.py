@@ -41,6 +41,40 @@ def _rotate_b64(data_b64: str | None, deg_clockwise: int) -> str | None:
     return base64.b64encode(buf.getvalue()).decode("ascii")
 
 
+def _span(vals, thresh):
+    """Longest contiguous run of indices whose value >= thresh (robust to a thin
+    bright edge artifact that a naive edge-trim would stop on)."""
+    best = (0, -1); cur = None
+    for i, v in enumerate(vals):
+        if v >= thresh:
+            if cur is None:
+                cur = i
+            if i - cur > best[1] - best[0]:
+                best = (cur, i)
+        else:
+            cur = None
+    return best if best[1] >= best[0] else (0, len(vals) - 1)
+
+
+def _trim_black_b64(data_b64: str | None, thresh: int = 70) -> str | None:
+    """Trim near-black feeder margins (left after deskew) via a content bounding box."""
+    if not data_b64:
+        return data_b64
+    img = Image.open(io.BytesIO(base64.b64decode(data_b64))).convert("RGB")
+    g = ImageOps.grayscale(img)
+    w, h = g.size
+    rows = list(g.resize((1, h), Image.Resampling.BOX).getdata())  # mean per row
+    cols = list(g.resize((w, 1), Image.Resampling.BOX).getdata())  # mean per column
+    top, bottom = _span(rows, thresh)
+    left, right = _span(cols, thresh)
+    if right <= left or bottom <= top:
+        return data_b64
+    crop = img.crop((left, top, right + 1, bottom + 1))
+    buf = io.BytesIO()
+    crop.save(buf, format="JPEG", quality=92)
+    return base64.b64encode(buf.getvalue()).decode("ascii")
+
+
 def _crop_enhance_b64(data_b64: str, bbox, pad: float = 0.06, upscale: float = 2.5,
                       max_edge: int = 2200) -> str | None:
     """Crop the seal box (fractions x,y,w,h), pad it, upscale, and boost contrast so
@@ -84,8 +118,9 @@ def _read_faces(front: str | None, back: str | None) -> tuple[str | None, str | 
         except Exception:
             pass2 = None
     form = merge_and_form(raw, pass2)
-    front_up = _rotate_b64(front, orient.get("front", 0))
-    back_up = _rotate_b64(back, orient.get("back", 0))
+    # Upright + trim any residual black feeder margin (deskew can leave one).
+    front_up = _trim_black_b64(_rotate_b64(front, orient.get("front", 0)))
+    back_up = _trim_black_b64(_rotate_b64(back, orient.get("back", 0)))
     return front_up, back_up, form
 
 
