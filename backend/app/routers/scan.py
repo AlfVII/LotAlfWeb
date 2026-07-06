@@ -106,6 +106,16 @@ def _read_faces(front: str | None, back: str | None) -> tuple[str | None, str | 
     Returns (front_upright, back_upright, form_fields)."""
     from ..ocr import extract_admin, extract_admin_crop, merge_and_form
     raw, orient, seal = extract_admin([front, back])
+    # Opus is conservative and returns no seal on very faint stamps; retry once with
+    # the fallback model (sonnet-5 reads faint ones opus won't commit to). Only fires
+    # on a miss, so it adds nothing to normal-scan cost.
+    used_model = None
+    if seal.get("cara") == "ninguno" or not (raw.get("municipio") or "").strip():
+        fb = get_settings().ANTHROPIC_FALLBACK_MODEL
+        if fb:
+            raw2, orient2, seal2 = extract_admin([front, back], model=fb)
+            if seal2.get("cara") != "ninguno" and (raw2.get("municipio") or "").strip():
+                raw, orient, seal, used_model = raw2, orient2, seal2, fb
     # Pass 2 — focused re-read of the seal crop (from the face as Claude saw it).
     pass2 = None
     cara = seal.get("cara")
@@ -114,7 +124,7 @@ def _read_faces(front: str | None, back: str | None) -> tuple[str | None, str | 
         try:
             crop = _crop_enhance_b64(src, seal["bbox"])
             if crop:
-                pass2 = extract_admin_crop(crop)
+                pass2 = extract_admin_crop(crop, model=used_model)
         except Exception:
             pass2 = None
     form = merge_and_form(raw, pass2)

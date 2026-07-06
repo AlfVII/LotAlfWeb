@@ -31,6 +31,10 @@ class Settings(BaseSettings):
     # OCR: Claude vision reads the administración seal off the scanned décimo
     ANTHROPIC_API_KEY: str | None = None
     ANTHROPIC_MODEL: str = "claude-opus-4-8"  # best accuracy on the faint administración seals
+    # Retried ONLY when opus reads no seal — opus is conservative and returns
+    # nothing on very faint stamps, where sonnet-5 will still read them. Set empty
+    # to disable the fallback.
+    ANTHROPIC_FALLBACK_MODEL: str = "claude-sonnet-5"
 
     @property
     def postgres_url(self) -> str | None:

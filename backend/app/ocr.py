@@ -10,7 +10,7 @@ import base64
 import io
 
 from anthropic import Anthropic
-from PIL import Image
+from PIL import Image, ImageOps
 
 from . import db
 from .config import get_settings
@@ -103,10 +103,10 @@ def _client() -> Anthropic:
     return Anthropic(api_key=settings.ANTHROPIC_API_KEY)
 
 
-def _call(content: list[dict], tool: dict) -> dict:
+def _call(content: list[dict], tool: dict, model: str | None = None) -> dict:
     settings = get_settings()
     msg = _client().messages.create(
-        model=settings.ANTHROPIC_MODEL,
+        model=model or settings.ANTHROPIC_MODEL,
         max_tokens=1024,
         thinking={"type": "disabled"},  # perception, not reasoning — faster/cheaper/deterministic
         tools=[tool],
@@ -126,19 +126,23 @@ def _call(content: list[dict], tool: dict) -> dict:
 _OCR_MAX_EDGE = 1600
 
 
-def _downscale_for_ocr(b64: str, max_edge: int = _OCR_MAX_EDGE) -> str:
+def _prep_for_ocr(b64: str, max_edge: int = _OCR_MAX_EDGE) -> str:
+    """Prepare a face for the vision call: cap the long edge at max_edge, then
+    grayscale + mild autocontrast. The downscale roughly halves token cost; the
+    grayscale/autocontrast makes the faint administración stamp read more
+    completely (evaluated — heavier contrast/threshold/sharpen hurt, so this stays
+    mild). Only the OCR copy is affected; the stored/displayed image is untouched."""
     try:
         img = Image.open(io.BytesIO(base64.b64decode(b64)))
-        if max(img.size) <= max_edge:
-            return b64
-        s = max_edge / max(img.size)
-        img = img.convert("RGB").resize(
-            (max(1, round(img.width * s)), max(1, round(img.height * s))), Image.LANCZOS)
+        if max(img.size) > max_edge:
+            s = max_edge / max(img.size)
+            img = img.resize((max(1, round(img.width * s)), max(1, round(img.height * s))), Image.LANCZOS)
+        img = ImageOps.autocontrast(ImageOps.grayscale(img), cutoff=1)
         buf = io.BytesIO()
         img.save(buf, format="JPEG", quality=92)
         return base64.b64encode(buf.getvalue()).decode("ascii")
     except Exception:
-        return b64  # a resize failure must never break OCR
+        return b64  # preprocessing must never break OCR
 
 
 def _image_block(b64: str) -> dict:
@@ -163,7 +167,7 @@ def _to_form(d: dict) -> dict:
     }
 
 
-def extract_admin(images_b64: list[str]) -> tuple[dict, dict, dict]:
+def extract_admin(images_b64: list[str], model: str | None = None) -> tuple[dict, dict, dict]:
     """Pass 1. Returns ``(raw_fields, orientation, seal)``.
 
     ``raw_fields`` is the raw Claude dict (before town lookup — the caller may
@@ -172,9 +176,9 @@ def extract_admin(images_b64: list[str]) -> tuple[dict, dict, dict]:
     ``seal`` = ``{"cara": "anverso"|"reverso"|"ninguno", "bbox": (x, y, w, h)}``
     with the box as fractions of the face as-scanned.
     """
-    content = [_image_block(_downscale_for_ocr(b)) for b in images_b64 if b]
+    content = [_image_block(_prep_for_ocr(b)) for b in images_b64 if b]
     content.append({"type": "text", "text": _PROMPT})
-    data = _call(content, _TOOL)
+    data = _call(content, _TOOL, model)
     orient = {
         "front": int(data.get("rotacion_anverso") or 0) % 360,
         "back": int(data.get("rotacion_reverso") or 0) % 360,
@@ -187,10 +191,10 @@ def extract_admin(images_b64: list[str]) -> tuple[dict, dict, dict]:
     return data, orient, seal
 
 
-def extract_admin_crop(crop_b64: str) -> dict:
+def extract_admin_crop(crop_b64: str, model: str | None = None) -> dict:
     """Pass 2. Re-read the enhanced seal crop; returns the raw Claude dict."""
     content = [_image_block(crop_b64), {"type": "text", "text": _CROP_PROMPT}]
-    return _call(content, _TOOL_CROP)
+    return _call(content, _TOOL_CROP, model)
 
 
 def merge_and_form(pass1: dict, pass2: dict | None) -> dict:
