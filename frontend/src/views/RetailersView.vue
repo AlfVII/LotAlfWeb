@@ -111,6 +111,19 @@ async function fillFromExtracted(ex) {
   form.value = f
 }
 
+// Scan only — no LLM, no cost. Just capture both faces and let the user type the
+// fields in by hand. The paid button below adds the Claude vision read.
+async function scanSolo() {
+  ocrNote.value = ''
+  try {
+    scanning.value = 'escaneando'
+    const { front, back } = await api.scanDuplex()
+    if (front) image.value = 'data:image/jpeg;base64,' + front
+    imageBack.value = back ? 'data:image/jpeg;base64,' + back : null
+    ocrNote.value = 'Escaneado (sin IA). Rellene los datos y pulse Guardar.'
+  } catch (e) { alert(e.message) } finally { scanning.value = '' }
+}
+
 async function scanDecimo() {
   ocrNote.value = ''
   try {
@@ -206,9 +219,14 @@ onUnmounted(() => window.removeEventListener('keydown', onKey))
             <div class="mt-2" v-if="image !== PLACEHOLDER">
               <button class="btn btn-outline-secondary btn-sm" @click="showZoom = true">🔍 Ampliar</button>
             </div>
-            <div id="screen_button" class="mt-2" v-if="auth.isEditor">
-              <button class="btn btn-outline-success btn-block" @click="scanDecimo" :disabled="!!scanning">
-                {{ scanning === 'escaneando' ? 'Escaneando…' : scanning === 'leyendo' ? 'Leyendo…' : 'Escanear décimo (ambas caras)' }}
+            <div id="screen_button" class="mt-2" style="display:flex;gap:6px" v-if="auth.isEditor">
+              <button class="btn btn-outline-secondary" style="flex:1" @click="scanSolo" :disabled="!!scanning"
+                      title="Escanea ambas caras sin leer los datos (gratis)">
+                {{ scanning === 'escaneando' ? 'Escaneando…' : 'Escanear (sin IA)' }}
+              </button>
+              <button class="btn btn-outline-success" style="flex:1" @click="scanDecimo" :disabled="!!scanning"
+                      title="Escanea y lee los datos del sello con IA">
+                {{ scanning === 'leyendo' ? 'Leyendo…' : scanning === 'escaneando' ? 'Escaneando…' : 'Escanear + leer (IA)' }}
               </button>
             </div>
             <div v-if="ocrNote" class="mt-1" style="font-family:var(--font-caps);font-size:13px;color:var(--tinta-sepia)">{{ ocrNote }}</div>

@@ -6,7 +6,11 @@ Two-pass strategy for the faint, overlapping stamp:
      more effective pixels on the exact text, so the faint number/phone read better.
 The town is looked up in the SQLite reference data to fill Comunidad + Provincia.
 """
+import base64
+import io
+
 from anthropic import Anthropic
+from PIL import Image
 
 from . import db
 from .config import get_settings
@@ -115,6 +119,28 @@ def _call(content: list[dict], tool: dict) -> dict:
     return {}
 
 
+# Full 600-dpi faces carry far more detail than the vision model needs and cost
+# ~2x the image tokens. Capping the long edge at 1600px reads the seal just as
+# reliably (verified 3/3 on real décimos) at ~35% lower cost. Only the OCR copy is
+# shrunk here — the stored/displayed image keeps its full resolution.
+_OCR_MAX_EDGE = 1600
+
+
+def _downscale_for_ocr(b64: str, max_edge: int = _OCR_MAX_EDGE) -> str:
+    try:
+        img = Image.open(io.BytesIO(base64.b64decode(b64)))
+        if max(img.size) <= max_edge:
+            return b64
+        s = max_edge / max(img.size)
+        img = img.convert("RGB").resize(
+            (max(1, round(img.width * s)), max(1, round(img.height * s))), Image.LANCZOS)
+        buf = io.BytesIO()
+        img.save(buf, format="JPEG", quality=92)
+        return base64.b64encode(buf.getvalue()).decode("ascii")
+    except Exception:
+        return b64  # a resize failure must never break OCR
+
+
 def _image_block(b64: str) -> dict:
     return {"type": "image", "source": {"type": "base64", "media_type": "image/jpeg", "data": b64}}
 
@@ -146,7 +172,7 @@ def extract_admin(images_b64: list[str]) -> tuple[dict, dict, dict]:
     ``seal`` = ``{"cara": "anverso"|"reverso"|"ninguno", "bbox": (x, y, w, h)}``
     with the box as fractions of the face as-scanned.
     """
-    content = [_image_block(b) for b in images_b64 if b]
+    content = [_image_block(_downscale_for_ocr(b)) for b in images_b64 if b]
     content.append({"type": "text", "text": _PROMPT})
     data = _call(content, _TOOL)
     orient = {
