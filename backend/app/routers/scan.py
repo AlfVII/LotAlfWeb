@@ -105,16 +105,24 @@ def _read_faces(front: str | None, back: str | None) -> tuple[str | None, str | 
     """Two-pass OCR: read both faces, then re-read a cropped/enhanced seal.
     Returns (front_upright, back_upright, form_fields)."""
     from ..ocr import extract_admin, extract_admin_crop, merge_and_form
+    from .. import db
+
+    def _resolves(muni: str | None) -> bool:
+        muni = (muni or "").strip().strip('"').strip("'").strip()
+        return bool(muni) and any(db.lookup_town(muni))
+
     raw, orient, seal = extract_admin([front, back])
-    # Opus is conservative and returns no seal on very faint stamps; retry once with
-    # the fallback model (sonnet-5 reads faint ones opus won't commit to). Only fires
-    # on a miss, so it adds nothing to normal-scan cost.
+    # Opus is conservative on faint stamps — it returns nothing, or a partial town
+    # ("Navas de San") that won't resolve to a province. When its read doesn't
+    # resolve, retry once with the fallback model (sonnet-5 reads faint seals opus
+    # won't commit to) and adopt it only if IT resolves. Fires only on an unusable
+    # read, so a normal scan still costs the same.
     used_model = None
-    if seal.get("cara") == "ninguno" or not (raw.get("municipio") or "").strip():
+    if not _resolves(raw.get("municipio")):
         fb = get_settings().ANTHROPIC_FALLBACK_MODEL
         if fb:
             raw2, orient2, seal2 = extract_admin([front, back], model=fb)
-            if seal2.get("cara") != "ninguno" and (raw2.get("municipio") or "").strip():
+            if _resolves(raw2.get("municipio")):
                 raw, orient, seal, used_model = raw2, orient2, seal2, fb
     # Pass 2 — focused re-read of the seal crop (from the face as Claude saw it).
     pass2 = None
