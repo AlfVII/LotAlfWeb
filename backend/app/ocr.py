@@ -83,6 +83,12 @@ _TOOL_CROP = {
 
 def _clean(v) -> str | None:
     v = (v or "").strip()
+    # Some models (e.g. claude-sonnet-5) return string values wrapped in literal
+    # quote characters; strip a single matching surrounding pair so '""' -> '' and
+    # '"Navas de San Juan"' -> 'Navas de San Juan'. Inner apostrophes are kept
+    # (e.g. "L'Alfàs del Pi"), since only a matching first/last quote is removed.
+    if len(v) >= 2 and v[0] == v[-1] and v[0] in ('"', "'"):
+        v = v[1:-1].strip()
     return v or None
 
 
