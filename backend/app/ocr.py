@@ -19,10 +19,10 @@ _ADMIN_FIELDS = {
     "numero": {"type": "string", "description": "Número de la administración, p. ej. '67' ('' si no aparece)"},
     "municipio": {"type": "string", "description": "Municipio/localidad con tildes ('' si no aparece)"},
     "nombre": {"type": "string", "description": "Nombre de la administración, p. ej. 'Doña Manolita' ('' si no)"},
-    "calle": {"type": "string"},
-    "numero_calle": {"type": "string"},
-    "codigo_postal": {"type": "string"},
-    "telefono": {"type": "string"},
+    "calle": {"type": "string", "description": "Calle/vía de la administración, sin el número ('' si no aparece)"},
+    "numero_calle": {"type": "string", "description": "Número del portal en la calle, p. ej. '12' ('' si no aparece)"},
+    "codigo_postal": {"type": "string", "description": "Código postal de 5 cifras ('' si no aparece)"},
+    "telefono": {"type": "string", "description": "Teléfono de la administración, solo cifras, p. ej. '953681508' (suele estar en el sello; '' si no se lee)"},
 }
 _ADMIN_REQUIRED = list(_ADMIN_FIELDS.keys())
 
