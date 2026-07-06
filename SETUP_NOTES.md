@@ -107,6 +107,14 @@ Verify the driver took:
   endpoints 503, but reference + scanner endpoints work. `db_ready:true` and the
   numbers/retailers/stats/comments features need the real Postgres creds.
 - `backend/.env` is gitignored — safe to hold values locally.
+- **`ANTHROPIC_MODEL`** defaults to `claude-opus-4-8` — it reads the faint
+  administración seals reliably (in testing `claude-sonnet-5` read this seal
+  correctly only ~1/3 of the time and mis-cased/mis-read it). `claude-sonnet-5` is
+  ~3× cheaper but not accurate enough here. Cost on opus-4-8 is ~$0.06–0.10 per
+  décimo (two Claude-vision passes; the seal image dominates the token count).
+  Note: OCR runs a two-pass read and `ocr.py::_clean` strips stray surrounding
+  quotes some models put around tool values (e.g. `"Navas de San Juan"`, `""`),
+  which otherwise break the town→región/provincia lookup.
 
 ## 7. Frontend backend URL — handoff is out of date
 The handoff says the backend URL is "hardcoded in `frontend/src/api.js`". It is

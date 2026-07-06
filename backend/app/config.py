@@ -30,7 +30,7 @@ class Settings(BaseSettings):
 
     # OCR: Claude vision reads the administración seal off the scanned décimo
     ANTHROPIC_API_KEY: str | None = None
-    ANTHROPIC_MODEL: str = "claude-sonnet-4-6"  # opus-4-8 for higher accuracy on faint seals
+    ANTHROPIC_MODEL: str = "claude-opus-4-8"  # best accuracy on the faint administración seals
 
     @property
     def postgres_url(self) -> str | None:
